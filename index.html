@@ -7,8 +7,8 @@
     <meta name="description" content="Монтаж и ремонт трубопроводов, теплоизоляция инженерных систем и аварийные работы 24/7 в Екатеринбурге и Свердловской области." />
     <title>Северстрой — монтаж, теплоизоляция и аварийные работы</title>
     <link rel="preload" href="assets/fonts/onest-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="styles.css?v=20260924" />
-    <script src="script.js?v=20260924" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260924c" />
+    <script src="script.js?v=20260924c" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">К содержанию</a>
@@ -83,7 +83,7 @@
             <div class="service-card-body">
               <h3>Монтаж трубопроводов</h3>
               <p>Прокладываем новые сети и заменяем участки действующих. Работаем с трубами обычного и большого диаметра.</p>
-              <a class="service-card-link" href="#contact" data-topic="Монтаж трубопроводов">Обсудить работы <span aria-hidden="true">↗</span></a>
+              <a class="service-card-link" href="#contact">Обсудить работы <span aria-hidden="true">↗</span></a>
             </div>
           </article>
           <article class="service-card">
@@ -91,7 +91,7 @@
             <div class="service-card-body">
               <h3>Теплоизоляция систем</h3>
               <p>Изолируем трубопроводы и оборудование. Решение подбирается под систему и условия на объекте.</p>
-              <a class="service-card-link" href="#contact" data-topic="Теплоизоляция">Обсудить работы <span aria-hidden="true">↗</span></a>
+              <a class="service-card-link" href="#contact">Обсудить работы <span aria-hidden="true">↗</span></a>
             </div>
           </article>
           <article class="service-card">
@@ -99,7 +99,7 @@
             <div class="service-card-body">
               <h3>Аварийные работы</h3>
               <p>Устраняем повреждения и восстанавливаем работу инженерных систем. Аварийные обращения принимаем 24/7.</p>
-              <a class="service-card-link" href="#contact" data-topic="Аварийные работы">Сообщить об аварии <span aria-hidden="true">↗</span></a>
+              <a class="service-card-link" href="#contact">Сообщить об аварии <span aria-hidden="true">↗</span></a>
             </div>
           </article>
         </div>
@@ -111,7 +111,7 @@
             <span class="emergency-hours">24/7</span>
             <h2 id="emergency-title">Авария на инженерной системе?</h2>
             <p>Работаем круглосуточно в Екатеринбурге и Свердловской области. Оставьте номер и коротко опишите ситуацию — уточним задачу и свяжемся с вами.</p>
-            <a class="button button-light" href="#contact" data-topic="Аварийные работы">Оставить срочную заявку <span aria-hidden="true">↗</span></a>
+            <a class="button button-light" href="#contact">Оставить срочную заявку <span aria-hidden="true">↗</span></a>
           </div>
           <div class="emergency-photo" role="img" aria-label="Бригада выполняет аварийный ремонт инженерной сети"></div>
         </div>
@@ -214,7 +214,7 @@
           <div class="contact-intro">
             <div class="section-side"><span class="section-mark"></span><span>Связаться</span></div>
             <h2 id="contact-title">Обсудим вашу задачу.</h2>
-            <p>Оставьте контакты и коротко опишите работы. Если обращение срочное, выберите «Аварийные работы».</p>
+            <p>Оставьте имя и телефон — мы свяжемся с вами и уточним детали. Описание и документы можно добавить, если они есть.</p>
             <div class="contact-direct">
               <span>Где работаем</span>
               <strong>Екатеринбург и Свердловская область</strong>
@@ -225,20 +225,9 @@
           <form class="contact-form" id="inquiry-form" novalidate>
             <div class="form-grid">
               <label><span class="field-label">Ваше имя <b>*</b></span><input name="name" type="text" autocomplete="name" placeholder="Как к вам обращаться" required /></label>
-              <label>Компания<input name="company" type="text" autocomplete="organization" placeholder="Название организации" /></label>
               <label><span class="field-label">Телефон <b>*</b></span><input name="phone" type="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" required /></label>
-              <label>Электронная почта<input name="email" type="email" autocomplete="email" placeholder="name@company.ru" /></label>
             </div>
-            <label class="topic-label" for="service-topic">Направление работ
-              <select id="service-topic" name="topic">
-                <option value="">Выберите направление</option>
-                <option value="Монтаж трубопроводов">Монтаж трубопроводов</option>
-                <option value="Теплоизоляция">Теплоизоляция</option>
-                <option value="Аварийные работы">Аварийные работы</option>
-                <option value="Другое">Другое</option>
-              </select>
-            </label>
-            <label class="message-label">Что нужно сделать<textarea name="message" rows="4" placeholder="Коротко опишите задачу"></textarea></label>
+            <label class="message-label"><span class="field-label">Коротко о задаче <span class="optional-label">необязательно</span></span><textarea name="message" rows="3" placeholder="Если удобно, расскажите, что нужно сделать"></textarea></label>
 
             <div class="upload-block" id="upload-block">
               <div class="upload-heading"><span class="upload-symbol" aria-hidden="true">＋</span><div><h3>Приложить документы</h3><p>Чертежи, ТЗ или другие материалы — если они есть</p></div></div>

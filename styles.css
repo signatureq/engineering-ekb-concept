@@ -144,10 +144,7 @@ a,button,input,textarea{outline-offset:4px}
 .emergency-copy .button{min-width:280px}
 .emergency-photo{min-height:570px;background:url('assets/emergency-repair.jpg') 53% center/cover no-repeat}
 .image-statement-copy p{max-width:660px}
-.contact-form select{appearance:none;border:0;border-bottom:1px solid #bcc8d3;border-radius:0;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='m1 1 6 6 6-6' fill='none' stroke='%23124ca1' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 4px center;color:var(--ink);width:100%;padding:12px 27px 15px 0;font:400 14px Onest,Arial,sans-serif;outline:none}
-.contact-form select:focus{border-bottom-color:var(--blue);box-shadow:0 1px 0 var(--blue)}
-.topic-label{margin-top:25px}
-.contact-form select:has(option[value=""]:checked){color:#687787}
+.optional-label{margin-left:7px;color:#7b8792;font-size:11px;font-weight:400}
 @media(min-width:1101px){
   .hero h1{font-size:clamp(54px,5.1vw,81px)}
   .hero-description{max-width:440px}

@@ -73,28 +73,17 @@ dropzone.addEventListener('drop', event => addFiles(event.dataTransfer.files));
 
 const form = document.querySelector('#inquiry-form');
 const status = document.querySelector('#form-status');
-const serviceTopic = document.querySelector('#service-topic');
-document.querySelectorAll('a[data-topic]').forEach(link => link.addEventListener('click', () => {
-  serviceTopic.value = link.dataset.topic;
-}));
 form.addEventListener('submit', event => {
   event.preventDefault();
   status.classList.remove('is-info');
   const name = form.elements.name;
   const phone = form.elements.phone;
-  [name, phone, form.elements.email].forEach(field => field.removeAttribute('aria-invalid'));
+  [name, phone].forEach(field => field.removeAttribute('aria-invalid'));
   if (!name.value.trim() || !phone.value.trim()) {
     if (!name.value.trim()) name.setAttribute('aria-invalid', 'true');
     if (!phone.value.trim()) phone.setAttribute('aria-invalid', 'true');
     status.textContent = 'Заполните имя и телефон, чтобы продолжить.';
     (!name.value.trim() ? name : phone).focus();
-    return;
-  }
-  const email = form.elements.email;
-  if (email.value && !email.validity.valid) {
-    email.setAttribute('aria-invalid', 'true');
-    status.textContent = 'Проверьте адрес электронной почты.';
-    email.focus();
     return;
   }
   status.classList.add('is-info');
