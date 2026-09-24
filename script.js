@@ -98,13 +98,13 @@ form.addEventListener('submit', event => {
     return;
   }
   status.classList.add('is-info');
-  status.textContent = 'Это макет. Заявка и файлы пока не отправляются.';
+  status.textContent = 'Заявка не отправлена: приём обращений через сайт ещё не подключён.';
 });
 
 // Motion follows the page's reading order; content stays visible if scripts stop.
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (!reduceMotion && 'IntersectionObserver' in window && 'animate' in Element.prototype) {
-  const animatedItems = document.querySelectorAll('.service-card, .emergency-copy, .process-grid article, .project-feature, .document-promo h2');
+  const animatedItems = document.querySelectorAll('.service-card, .emergency-copy, .work-areas-grid article, .coverage-hours, .process-grid article, .project-feature, .document-promo h2');
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
