@@ -90,27 +90,99 @@ form.addEventListener('submit', event => {
   status.textContent = 'Заявка не отправлена: приём обращений через сайт ещё не подключён.';
 });
 
-// Motion follows the page's reading order; content stays visible if scripts stop.
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-if (!reduceMotion && 'IntersectionObserver' in window && 'animate' in Element.prototype) {
-  const animatedItems = document.querySelectorAll('.service-card, .emergency-copy, .work-areas-grid article, .coverage-hours, .process-grid article, .project-feature, .document-promo h2');
+// Prepare entrances outside the viewport so visible content never jumps backwards.
+const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+if (!motionPreference.matches && 'IntersectionObserver' in window && 'animate' in Element.prototype) {
+  const selectors = [
+    '.intro-main > *', '.section-heading-row', '.service-card',
+    '.emergency-copy', '.image-statement-copy p', '.work-areas-grid article',
+    '.coverage-copy', '.coverage-hours', '.process-grid article', '.start-grid article',
+    '.project-feature-body', '.document-promo > div', '.contact-intro', '.contact-form'
+  ];
+  const pending = new Set();
+  const active = new Map();
+  const delays = new Map();
+  const ease = 'cubic-bezier(.22, 1, .36, 1)';
+  const viewportHeight = document.documentElement.clientHeight;
+  // Batch geometry reads before adding any motion styles.
+  const items = [...document.querySelectorAll(selectors.join(', '))].map(item => ({
+    item, top: item.getBoundingClientRect().top
+  }));
+  const rows = new Map();
+
+  function settle(item) {
+    observer.unobserve(item);
+    pending.delete(item);
+    item.classList.remove('motion-pending');
+    active.get(item)?.cancel();
+    active.delete(item);
+    item.classList.remove('motion-running');
+  }
+
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
+      if (!entry.isIntersecting || !pending.has(entry.target)) return;
       const item = entry.target;
-      item.animate([
-        { opacity: .72, transform: 'translateY(18px)' },
-        { opacity: 1, transform: 'translateY(0)' }
-      ], {
-        duration: 720,
-        delay: Number(item.dataset.motionIndex || 0) * 90,
-        easing: 'cubic-bezier(.16, 1, .3, 1)'
-      });
       observer.unobserve(item);
+      pending.delete(item);
+      // Preferences and background tabs settle immediately; crossed content finishes quickly.
+      if (document.hidden || motionPreference.matches) {
+        settle(item);
+        return;
+      }
+      const crossed = entry.boundingClientRect.top < 0;
+      const fadeOnly = item.matches('.coverage-hours, .contact-form');
+      const frames = fadeOnly
+        ? [{ opacity: .58 }, { opacity: 1 }]
+        : [{ opacity: .58, transform: 'translateY(12px)' }, { opacity: 1, transform: 'translateY(0)' }];
+      try {
+        const animation = item.animate(frames, {
+          duration: crossed ? 180 : (fadeOnly ? 650 : 620),
+          delay: crossed ? 0 : (delays.get(item) || 0),
+          easing: ease,
+          // Hold the prepared frame during stagger delays, never flash the final frame.
+          fill: 'backwards'
+        });
+        item.classList.remove('motion-pending');
+        item.classList.add('motion-running');
+        active.set(item, animation);
+        const cleanup = () => {
+          active.delete(item);
+          item.classList.remove('motion-running');
+        };
+        animation.onfinish = cleanup;
+        animation.oncancel = cleanup;
+      } catch {
+        settle(item);
+      }
     });
-  }, { threshold: .12, rootMargin: '0px 0px -7% 0px' });
-  animatedItems.forEach((item, index) => {
-    item.dataset.motionIndex = index % 3;
+  }, { threshold: 0, rootMargin: '0px 0px 80px 0px' });
+
+  items.forEach(({ item, top }) => {
+    // Keep initially visible and near-visible content untouched.
+    if (top < viewportHeight + 80) return;
+    if (item.matches('.service-card, .work-areas-grid article, .process-grid article, .start-grid article')) {
+      const previous = rows.get(item.parentElement);
+      const column = previous && Math.abs(previous.top - top) < 8 ? previous.column + 1 : 0;
+      rows.set(item.parentElement, { top, column });
+      delays.set(item, Math.min(column * 60, 120));
+    }
+    item.classList.add('motion-pending');
+    pending.add(item);
     observer.observe(item);
+  });
+
+  motionPreference.addEventListener('change', event => {
+    if (!event.matches) return;
+    observer.disconnect();
+    [...pending, ...active.keys()].forEach(settle);
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) [...active.keys()].forEach(settle);
+  });
+  document.addEventListener('focusin', event => {
+    [...pending, ...active.keys()].forEach(item => {
+      if (item.contains(event.target)) settle(item);
+    });
   });
 }
