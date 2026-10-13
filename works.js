@@ -5,20 +5,17 @@ const viewer = document.querySelector('.photo-viewer');
 if (viewer && typeof viewer.showModal === 'function') {
   const viewerImage = viewer.querySelector('.viewer-image');
   const viewerTitle = viewer.querySelector('#viewer-title');
-  const viewerAddress = viewer.querySelector('#viewer-address');
   const viewerCount = viewer.querySelector('.viewer-count');
   const viewerError = viewer.querySelector('.viewer-error');
   let currentPhoto = 0;
+  let returnFocus = null;
+  viewer.querySelector('.viewer-navigation').hidden = photoLinks.length < 2;
 
   function showPhoto(index) {
     currentPhoto = (index + photoLinks.length) % photoLinks.length;
     const link = photoLinks[currentPhoto];
-    const item = link.closest('.work-item');
     const photo = link.querySelector('img');
-    const address = item.querySelector('.work-address').textContent.trim();
-    viewerTitle.textContent = item.querySelector('h2').textContent;
-    viewerAddress.textContent = address;
-    viewerAddress.hidden = !address;
+    viewerTitle.textContent = link.dataset.photoCaption;
     viewerCount.textContent = `${currentPhoto + 1} / ${photoLinks.length}`;
     viewerError.hidden = true;
     viewerImage.hidden = false;
@@ -31,6 +28,7 @@ if (viewer && typeof viewer.showModal === 'function') {
   photoLinks.forEach((link, index) => link.addEventListener('click', event => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
     event.preventDefault();
+    returnFocus = link;
     showPhoto(index);
     viewer.showModal();
     document.documentElement.classList.add('photo-viewer-open');
@@ -50,9 +48,27 @@ if (viewer && typeof viewer.showModal === 'function') {
     const bounds = viewer.getBoundingClientRect();
     if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) viewer.close();
   });
-  viewer.addEventListener('close', () => document.documentElement.classList.remove('photo-viewer-open'));
+  viewer.addEventListener('close', () => {
+    document.documentElement.classList.remove('photo-viewer-open');
+    returnFocus?.focus({ preventScroll: true });
+  });
   viewerImage.addEventListener('error', () => {
     viewerImage.hidden = true;
     viewerError.hidden = false;
   });
+}
+
+// Filtering progressively enhances the complete, server-rendered portfolio.
+const filters = document.querySelector('.portfolio-filters');
+if (filters) {
+  const cards = [...document.querySelectorAll('.portfolio-card')];
+  const total = document.querySelector('.portfolio-total');
+  filters.hidden = false;
+  filters.querySelectorAll('button').forEach(button => button.addEventListener('click', () => {
+    filters.querySelectorAll('button').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+    cards.forEach(card => { card.hidden = button.dataset.filter !== 'all' && card.dataset.category !== button.dataset.filter; });
+    const shown = cards.filter(card => !card.hidden);
+    const photos = shown.reduce((sum, card) => sum + Number.parseInt(card.querySelector('.photo-count').textContent, 10), 0);
+    total.textContent = `Показано: ${shown.length} из ${cards.length} · ${photos} фото`;
+  }));
 }

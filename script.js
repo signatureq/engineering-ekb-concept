@@ -14,7 +14,14 @@ mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', 
   menuButton.setAttribute('aria-label', 'Открыть меню');
 }));
 
-// The contact form is present only on the main page.
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && menuButton.getAttribute('aria-expanded') === 'true') {
+    menuButton.click();
+    menuButton.focus();
+  }
+});
+
+// Form submission is intentionally deferred until server deployment.
 if (document.querySelector('#inquiry-form')) {
   const fileInput = document.querySelector('#files');
   const fileList = document.querySelector('#file-list');
@@ -44,13 +51,13 @@ if (document.querySelector('#inquiry-form')) {
   }
 
   function addFiles(files) {
-    const allowed = /\.(pdf|doc|docx|xls|xlsx|dwg|dxf|zip)$/i;
+    const allowed = /\.(jpg|jpeg|png|webp|pdf|doc|docx|xls|xlsx|dwg|dxf|zip)$/i;
     const chosen = [...files];
     const invalid = chosen.filter(file => !allowed.test(file.name));
     const message = document.querySelector('#form-status');
     if (invalid.length) {
       message.classList.remove('is-info');
-      message.textContent = 'Поддерживаются PDF, DOC, DOCX, XLS, XLSX, DWG, DXF и ZIP. Выберите файл в одном из этих форматов.';
+      message.textContent = 'Поддерживаются JPG, PNG, WebP, PDF, DOC, DOCX, XLS, XLSX, DWG, DXF и ZIP. Выберите файл в одном из этих форматов.';
     } else {
       message.textContent = '';
     }
@@ -74,7 +81,12 @@ if (document.querySelector('#inquiry-form')) {
   dropzone.addEventListener('drop', event => addFiles(event.dataTransfer.files));
 
   const form = document.querySelector('#inquiry-form');
+  const requestedService = new URLSearchParams(window.location.search).get('service');
+  if ([...form.elements.service.options].some(option => option.value === requestedService)) {
+    form.elements.service.value = requestedService;
+  }
   const status = document.querySelector('#form-status');
+  form.querySelector('[type=submit]').disabled = false;
   form.addEventListener('submit', event => {
     event.preventDefault();
     status.classList.remove('is-info');

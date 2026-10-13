@@ -1,0 +1,452 @@
+[
+  {
+    "slug": "naruzhnye-seti",
+    "title": "Каналы наружных инженерных сетей",
+    "category": "outside",
+    "service": "pipeline-installation",
+    "summary": "Железобетонные лотки и камеры на открытом участке трассы.",
+    "description": [
+      "Участок наружных инженерных сетей рядом со зданием. В открытой траншее видны железобетонные лотки, прямоугольные камеры и круглый колодец.",
+      "Фотографии показывают расположение канала и отдельных узлов с нескольких ракурсов: от общей трассы до участков примыкания камер."
+    ],
+    "details": [
+      "Канальная прокладка наружных сетей",
+      "Железобетонные лотки и камеры",
+      "Открытая траншея на территории объекта"
+    ],
+    "photos": [
+      {
+        "src": "assets/projects/naruzhnye-seti/01.webp",
+        "small": "assets/projects/naruzhnye-seti/01-small.webp",
+        "width": 900,
+        "height": 1600,
+        "small_width": 405,
+        "caption": "Общий вид трассы с камерами и колодцем",
+        "source": "photo_1_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/naruzhnye-seti/02.webp",
+        "small": "assets/projects/naruzhnye-seti/02-small.webp",
+        "width": 900,
+        "height": 1600,
+        "small_width": 405,
+        "caption": "Железобетонные лотки вдоль здания",
+        "source": "photo_3_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/naruzhnye-seti/03.webp",
+        "small": "assets/projects/naruzhnye-seti/03-small.webp",
+        "width": 900,
+        "height": 1600,
+        "small_width": 405,
+        "caption": "Участок канала у технической камеры",
+        "source": "photo_16_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/naruzhnye-seti/04.webp",
+        "small": "assets/projects/naruzhnye-seti/04-small.webp",
+        "width": 900,
+        "height": 1600,
+        "small_width": 405,
+        "caption": "Расположение камер на наружной трассе",
+        "source": "photo_17_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/naruzhnye-seti/05.webp",
+        "small": "assets/projects/naruzhnye-seti/05-small.webp",
+        "width": 900,
+        "height": 1600,
+        "small_width": 405,
+        "caption": "Продольный вид открытого канала",
+        "source": "photo_20_2026-10-13_17-47-17.jpg"
+      }
+    ],
+    "location": null,
+    "cover_position": "50% 48%"
+  },
+  {
+    "slug": "teploizolyaciya-naruzhnyh-setey",
+    "title": "Теплоизоляция наружных трубопроводов",
+    "category": "insulation",
+    "service": "insulation",
+    "summary": "Изоляция прямых участков, поворотов и вертикальных отводов.",
+    "description": [
+      "Серия работ с теплоизоляцией трубопроводов на открытом воздухе. На снимках видны прямолинейные участки, повороты и переходы на вертикальные отводы.",
+      "Подборка показывает открытый теплоизоляционный слой, участки с отражающим покрытием и трубопровод в металлической оболочке. Разные ракурсы позволяют рассмотреть стыки, изгибы и протяжённые участки трассы."
+    ],
+    "details": [
+      "Теплоизоляционный слой на наружной трассе",
+      "Покрытие поворотов и вертикальных участков",
+      "Защитная оболочка трубопровода"
+    ],
+    "photos": [
+      {
+        "src": "assets/projects/teploizolyaciya-naruzhnyh-setey/01.webp",
+        "small": "assets/projects/teploizolyaciya-naruzhnyh-setey/01-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Изолированный участок вдоль ограждения",
+        "source": "photo_18_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/teploizolyaciya-naruzhnyh-setey/02.webp",
+        "small": "assets/projects/teploizolyaciya-naruzhnyh-setey/02-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Теплоизоляционный слой до закрытия оболочкой",
+        "source": "photo_27_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/teploizolyaciya-naruzhnyh-setey/03.webp",
+        "small": "assets/projects/teploizolyaciya-naruzhnyh-setey/03-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Прямой участок с наружным покрытием",
+        "source": "photo_11_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/teploizolyaciya-naruzhnyh-setey/04.webp",
+        "small": "assets/projects/teploizolyaciya-naruzhnyh-setey/04-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Изоляция вертикальных участков и отводов",
+        "source": "photo_12_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/teploizolyaciya-naruzhnyh-setey/05.webp",
+        "small": "assets/projects/teploizolyaciya-naruzhnyh-setey/05-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Переход трубопровода на вертикальный участок",
+        "source": "photo_13_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/teploizolyaciya-naruzhnyh-setey/06.webp",
+        "small": "assets/projects/teploizolyaciya-naruzhnyh-setey/06-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Трубопровод в металлической защитной оболочке",
+        "source": "photo_26_2026-10-13_17-47-17.jpg"
+      }
+    ],
+    "location": null,
+    "cover_position": "50% 50%"
+  },
+  {
+    "slug": "teplovoy-punkt",
+    "title": "Трубопроводы и изоляция теплового пункта",
+    "category": "inside",
+    "service": "insulation",
+    "summary": "Обвязка оборудования, арматура и теплоизоляция в техническом помещении.",
+    "description": [
+      "Работы с трубопроводами и оборудованием теплового пункта. В помещении расположены насосные узлы, запорная арматура, манометры и линии в теплоизоляции.",
+      "Общие планы показывают компоновку оборудования, а крупные — соединения, отводы и доступ к органам управления. На одном из снимков зафиксирован процесс работы в техническом помещении."
+    ],
+    "details": [
+      "Обвязка насосного оборудования",
+      "Запорная арматура и измерительные приборы",
+      "Теплоизоляция прямых участков и отводов"
+    ],
+    "photos": [
+      {
+        "src": "assets/projects/teplovoy-punkt/01.webp",
+        "small": "assets/projects/teplovoy-punkt/01-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Общий вид помещения во время работ",
+        "source": "photo_29_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/teplovoy-punkt/02.webp",
+        "small": "assets/projects/teplovoy-punkt/02-small.webp",
+        "width": 1600,
+        "height": 1200,
+        "small_width": 720,
+        "caption": "Трубопроводы с манометрами и запорной арматурой",
+        "source": "photo_2_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/teplovoy-punkt/03.webp",
+        "small": "assets/projects/teplovoy-punkt/03-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Обвязка оборудования и теплоизоляция отводов",
+        "source": "photo_22_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/teplovoy-punkt/04.webp",
+        "small": "assets/projects/teplovoy-punkt/04-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Насосное оборудование и изолированные линии",
+        "source": "photo_4_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/teplovoy-punkt/05.webp",
+        "small": "assets/projects/teplovoy-punkt/05-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Ряд трубопроводов и арматуры на монтажной раме",
+        "source": "photo_25_2026-10-13_17-47-17.jpg"
+      }
+    ],
+    "location": null,
+    "cover_position": "50% 50%"
+  },
+  {
+    "slug": "nasosnyy-uzel",
+    "title": "Насосный узел в техническом помещении",
+    "category": "inside",
+    "service": "pipeline-installation",
+    "summary": "Насосы, шкаф управления и разводка трубопроводов внутри здания.",
+    "description": [
+      "Насосный узел с вертикальными насосами и шкафом управления. Оборудование соединено с трубопроводами через арматуру и фланцевые соединения.",
+      "В галерее — общий вид инженерного помещения, компоновка насосной группы и крупный план обвязки. Видны трассы трубопроводов вдоль стен и переходы к оборудованию."
+    ],
+    "details": [
+      "Монтажная компоновка насосной группы",
+      "Обвязка и фланцевые соединения",
+      "Трубопроводы внутри технического помещения"
+    ],
+    "photos": [
+      {
+        "src": "assets/projects/nasosnyy-uzel/01.webp",
+        "small": "assets/projects/nasosnyy-uzel/01-small.webp",
+        "width": 1600,
+        "height": 1200,
+        "small_width": 720,
+        "caption": "Общий вид насосного узла и трубопроводов",
+        "source": "photo_7_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/nasosnyy-uzel/02.webp",
+        "small": "assets/projects/nasosnyy-uzel/02-small.webp",
+        "width": 1600,
+        "height": 1200,
+        "small_width": 720,
+        "caption": "Насосная группа, арматура и шкаф управления",
+        "source": "photo_6_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/nasosnyy-uzel/03.webp",
+        "small": "assets/projects/nasosnyy-uzel/03-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Размещение оборудования вдоль стены",
+        "source": "photo_21_2026-10-13_17-47-17.jpg"
+      }
+    ],
+    "location": null,
+    "cover_position": "50% 50%"
+  },
+  {
+    "slug": "kollektornaya-razvodka",
+    "title": "Коллекторная разводка трубопроводов",
+    "category": "inside",
+    "service": "pipeline-installation",
+    "summary": "Распределительные коллекторы с отдельными отводами и кранами.",
+    "description": [
+      "Распределительный узел с несколькими линиями трубопроводов. На каждом отводе установлена запорная арматура; линии проходят в красной и синей защитной оболочке.",
+      "Фотографии дают общий вид двух коллекторов и показывают подключения крупным планом. На узле также виден манометр для контроля давления."
+    ],
+    "details": [
+      "Распределительные коллекторы",
+      "Индивидуальная арматура на отводах",
+      "Подключения и контроль давления"
+    ],
+    "photos": [
+      {
+        "src": "assets/projects/kollektornaya-razvodka/01.webp",
+        "small": "assets/projects/kollektornaya-razvodka/01-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Общий вид коллекторного узла",
+        "source": "photo_8_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/kollektornaya-razvodka/02.webp",
+        "small": "assets/projects/kollektornaya-razvodka/02-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Распределительные линии и запорные краны",
+        "source": "photo_5_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/kollektornaya-razvodka/03.webp",
+        "small": "assets/projects/kollektornaya-razvodka/03-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Подключения коллекторов и манометр",
+        "source": "photo_10_2026-10-13_17-47-17.jpg"
+      }
+    ],
+    "location": null,
+    "cover_position": "50% 50%"
+  },
+  {
+    "slug": "truboprovody-parkinga",
+    "title": "Трубопроводы подземного паркинга",
+    "category": "inside",
+    "service": "pipeline-installation",
+    "summary": "Подвесная прокладка трубопроводов под перекрытием паркинга.",
+    "description": [
+      "Трубопроводы проложены под потолком подземного паркинга. Красные линии проходят вдоль проездов, огибают конструктивные элементы и соединяются через отводы.",
+      "Общие планы позволяют рассмотреть направление трасс, узлы поворота и размещение коммуникаций относительно колонн и перекрытий."
+    ],
+    "details": [
+      "Подвесная прокладка трубопроводов",
+      "Повороты и ответвления трассы",
+      "Размещение коммуникаций под перекрытием"
+    ],
+    "photos": [
+      {
+        "src": "assets/projects/truboprovody-parkinga/01.webp",
+        "small": "assets/projects/truboprovody-parkinga/01-small.webp",
+        "width": 1600,
+        "height": 1200,
+        "small_width": 720,
+        "caption": "Общий вид трубопроводов под перекрытием",
+        "source": "photo_23_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/truboprovody-parkinga/02.webp",
+        "small": "assets/projects/truboprovody-parkinga/02-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Продольная трасса над проездом паркинга",
+        "source": "photo_19_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/truboprovody-parkinga/03.webp",
+        "small": "assets/projects/truboprovody-parkinga/03-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Поворот трубопровода у колонны",
+        "source": "photo_24_2026-10-13_17-47-17.jpg"
+      }
+    ],
+    "location": null,
+    "cover_position": "50% 50%"
+  },
+  {
+    "slug": "seti-zhilogo-kompleksa",
+    "title": "Наружные сети жилого комплекса",
+    "category": "outside",
+    "service": "pipeline-installation",
+    "summary": "Подготовка участка и работа с трубопроводами между корпусами.",
+    "description": [
+      "Участок инженерных сетей на территории жилого комплекса. На фотографиях видны подготовленная зона работ, строительная техника и трубы между корпусами.",
+      "Подборка показывает два рабочих ракурса: участок с экскаватором и материалы на трассе, где специалисты работают с трубопроводом."
+    ],
+    "details": [
+      "Рабочая зона на территории жилого комплекса",
+      "Подготовка участка с применением техники",
+      "Трубопроводы на наружной трассе"
+    ],
+    "photos": [
+      {
+        "src": "assets/projects/seti-zhilogo-kompleksa/01.webp",
+        "small": "assets/projects/seti-zhilogo-kompleksa/01-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Работа с трубопроводами между корпусами",
+        "source": "photo_31_2026-10-13_17-47-17.jpg"
+      },
+      {
+        "src": "assets/projects/seti-zhilogo-kompleksa/02.webp",
+        "small": "assets/projects/seti-zhilogo-kompleksa/02-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Экскаватор на подготовленном участке",
+        "source": "photo_14_2026-10-13_17-47-17.jpg"
+      }
+    ],
+    "location": null,
+    "cover_position": "50% 50%"
+  },
+  {
+    "slug": "svarka-truboprovodov",
+    "title": "Сварка труб большого диаметра",
+    "category": "outside",
+    "service": "pipeline-installation",
+    "summary": "Сварочные работы на стыках стального трубопровода в траншее.",
+    "description": [
+      "Сварочные работы на стальном трубопроводе большого диаметра. Снимки сделаны непосредственно в траншее и показывают работу специалиста на стыке труб.",
+      "Два ракурса позволяют рассмотреть расположение трубопровода, зону соединения и рабочее место сварщика."
+    ],
+    "details": [
+      "Стальной трубопровод большого диаметра",
+      "Сварочные работы на соединениях",
+      "Монтаж на открытом участке трассы"
+    ],
+    "photos": [
+      {
+        "src": "assets/projects/svarka-truboprovodov/01.webp",
+        "small": "assets/projects/svarka-truboprovodov/01-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Сварщик на стыке трубопровода в траншее",
+        "source": "pipeline-welding.jpg"
+      },
+      {
+        "src": "assets/projects/svarka-truboprovodov/02.webp",
+        "small": "assets/projects/svarka-truboprovodov/02-small.webp",
+        "width": 1200,
+        "height": 1600,
+        "small_width": 540,
+        "caption": "Крупный план сварочных работ на соединении труб",
+        "source": "pipeline-installation.jpg"
+      }
+    ],
+    "location": null,
+    "cover_position": "50% 40%"
+  },
+  {
+    "slug": "kommercheskiy-uzel-ucheta",
+    "title": "Сборка коммерческого узла учёта",
+    "category": "inside",
+    "service": "metering",
+    "summary": "Монтажные работы в помещении с трубопроводами и насосным оборудованием.",
+    "description": [
+      "Монтаж и сборка коммерческого узла учёта в техническом помещении. На фотографии специалисты работают с оборудованием среди красных трубопроводов и запорной арматуры.",
+      "Снимок показывает рабочую компоновку узла: вертикальные и горизонтальные линии, фланцевые соединения и насосное оборудование."
+    ],
+    "details": [
+      "Сборка узла в техническом помещении",
+      "Трубопроводы и запорная арматура",
+      "Работа с насосным оборудованием"
+    ],
+    "photos": [
+      {
+        "src": "assets/projects/kommercheskiy-uzel-ucheta/01.webp",
+        "small": "assets/projects/kommercheskiy-uzel-ucheta/01-small.webp",
+        "width": 1600,
+        "height": 1200,
+        "small_width": 720,
+        "caption": "Специалисты во время сборки коммерческого узла учёта",
+        "source": "repair-team.jpg"
+      }
+    ],
+    "location": null,
+    "cover_position": "50% 50%"
+  }
+]

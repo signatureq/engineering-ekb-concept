@@ -1,0 +1,24 @@
+<form class="contact-form" id="inquiry-form" novalidate>
+            <p class="form-demo-notice">Отправка через форму пока недоступна. Для заявки позвоните <a href="tel:+79024453001">+7 (902) 445-30-01</a>.</p>
+            <div class="form-grid">
+              <label><span class="field-label">Ваше имя <b>*</b></span><input name="name" type="text" autocomplete="name" placeholder="Как к вам обращаться" required /></label>
+              <label><span class="field-label">Телефон <b>*</b></span><input name="phone" type="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" required /></label>
+            </div>
+            <label class="service-choice"><span class="field-label">Какие работы нужны</span><select name="service"><option value="">Выберите направление</option value="pipeline-installation">Монтаж трубопроводов</option><option value="insulation">Теплоизоляция</option><option value="metering">Узлы учёта</option><option value="emergency">Аварийные работы</option></select></label>
+            <label class="message-label"><span class="field-label">Коротко о задаче <span class="optional-label">необязательно</span></span><textarea name="message" rows="3" placeholder="Если удобно, расскажите, что нужно сделать"></textarea></label>
+
+            <div class="upload-block" id="upload-block">
+              <div class="upload-heading"><span class="upload-symbol" aria-hidden="true">＋</span><div><h3>Приложить документы</h3><p>Чертежи, ТЗ или другие материалы — если они есть</p></div></div>
+              <label class="dropzone" id="dropzone" for="files">
+                <span class="dropzone-main">Перетащите файлы сюда или <span>выберите на устройстве</span></span>
+                <span class="dropzone-detail">Фото, PDF, DOC, DOCX, XLS, XLSX, DWG, DXF, ZIP</span>
+                <input class="visually-hidden" id="files" name="files" type="file" multiple accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.xls,.xlsx,.dwg,.dxf,.zip" />
+              </label>
+              <ul class="file-list" id="file-list" aria-live="polite"></ul>
+            </div>
+
+            <div class="form-end">
+              <button class="button button-primary" type="submit" disabled>Отправить заявку <span aria-hidden="true">↗</span></button>
+            </div>
+            <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+          </form>
