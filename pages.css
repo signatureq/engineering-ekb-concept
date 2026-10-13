@@ -7,7 +7,8 @@ h1,h2,h3{text-wrap:balance}
 .site-header{gap:24px}
 .desktop-nav{gap:clamp(15px,1.6vw,28px)}
 .desktop-nav a{padding:12px 0}
-.desktop-nav a[aria-current=page]{color:var(--blue);text-decoration:underline;text-underline-offset:7px}
+.desktop-nav a::after{bottom:4px}
+.desktop-nav a[aria-current=page]{color:var(--blue)}
 .header-phone{display:inline-flex;align-items:center;gap:11px;flex:none;padding:13px 16px;color:var(--blue);background:#edf3fb;font-weight:700;font-size:15px;white-space:nowrap;transition:background .2s}
 .header-phone:hover{background:#dce9fa}
 .site-footer{padding-bottom:125px;border-top:1px solid var(--line)}
