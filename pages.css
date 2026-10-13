@@ -5,6 +5,10 @@ body{caret-color:var(--blue)}
 svg{flex:none;width:22px;height:22px;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 h1,h2,h3{text-wrap:balance}
 .site-header{gap:24px}
+.brand-lockup,.footer-brand{display:inline-flex;flex-direction:column;align-items:flex-start;gap:3px}
+.brand-lockup>.brand-name{line-height:1.1}
+.brand-subtitle,.footer-brand .brand-subtitle{font-size:10px;line-height:1.3;font-weight:500;letter-spacing:0;color:var(--muted);white-space:nowrap}
+.site-footer .brand-name{font-size:23px;line-height:1.1;color:var(--ink)}
 .desktop-nav{gap:clamp(15px,1.6vw,28px)}
 .desktop-nav a{padding:12px 0}
 .desktop-nav a::after{bottom:4px}
