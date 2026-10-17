@@ -5,40 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#ffffff" />
   <meta name="description" content="$description" />
-  <title>$title — СК Орион</title>
+  <title>$title — $company</title>
   <link rel="canonical" href="https://stroy-ekb.ru/$route" />
   <link rel="preload" href="${prefix}assets/fonts/onest-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
   $preload
   <link rel="stylesheet" href="${prefix}styles.css?v=20261013-pages" />
-  <link rel="stylesheet" href="${prefix}pages.css?v=20261013-brand-caption" />
+  <link rel="stylesheet" href="${prefix}pages.css?v=20261017-articles-final" />
   <script src="${prefix}script.js?v=20261013-pages" defer></script>
+  $extra_head
   $extra_script
 </head>
 <body class="$body_class">
   <a class="skip-link" href="#main">К содержанию</a>
   <header class="site-header" id="top">
     <a class="brand" href="${prefix}index.html" aria-label="СК Орион — главная">
-      <span class="brand-lockup"><span class="brand-name">СК ОРИОН<span class="brand-dot">.</span></span><span class="brand-subtitle">строительная компания</span></span>
+      <span class="brand-lockup"><span class="brand-name">$company_upper<span class="brand-dot">.</span></span><span class="brand-subtitle">строительная компания</span></span>
       <span class="brand-divider" aria-hidden="true"></span>
       <span class="brand-descriptor">инженерные сети<br />Екатеринбург и область</span>
     </a>
     <nav class="desktop-nav" aria-label="Основная навигация">$navigation</nav>
-    <a class="header-phone" href="tel:+79024453001">$phone_icon<span>+7 (902) 445-30-01</span></a>
+    <a class="header-phone" href="$phone_href">$phone_icon<span>$phone</span></a>
     <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-controls="mobile-menu" aria-expanded="false"><span></span><span></span></button>
   </header>
   <nav class="mobile-menu" id="mobile-menu" aria-label="Мобильная навигация" hidden>
     $navigation
     <a href="${prefix}request.html#request">Оставить заявку</a>
-    <a class="button button-primary" href="tel:+79024453001">+7 (902) 445-30-01 $phone_icon</a>
+    <a class="button button-primary" href="$phone_href">$phone $phone_icon</a>
   </nav>
   <main id="main">$content</main>
   <footer class="site-footer section-shell">
-    <div><a class="footer-brand" href="${prefix}index.html"><span class="brand-name">СК ОРИОН<span class="brand-dot">.</span></span><span class="brand-subtitle">строительная компания</span></a><p>Монтаж, теплоизоляция и аварийные работы.<br />Екатеринбург и Свердловская область.</p></div>
+    <div><a class="footer-brand" href="${prefix}index.html"><span class="brand-name">$company_upper<span class="brand-dot">.</span></span><span class="brand-subtitle">строительная компания</span></a><p>Монтаж, теплоизоляция и аварийные работы.<br />Екатеринбург и Свердловская область.</p></div>
     <nav aria-label="Навигация в подвале">$navigation<a href="${prefix}request.html#request">Оставить заявку</a></nav>
-    <div class="footer-end"><a class="footer-phone" href="tel:+79024453001">+7 (902) 445-30-01</a><a href="${prefix}services/emergency.html">Аварийные обращения — 24/7</a><a href="#top">Наверх ↑</a></div>
+    <div class="footer-end"><a class="footer-phone" href="$phone_href">$phone</a><a href="${prefix}services/emergency.html">Аварийные обращения — 24/7</a><a href="#top">Наверх ↑</a></div>
   </footer>
   <aside class="contact-dock" aria-label="Связаться с СК Орион">
-    <a class="dock-call" href="tel:+79024453001">$phone_icon<span><strong>Позвонить</strong><span class="dock-number">+7 (902) 445-30-01</span></span></a>
+    <a class="dock-call" href="$phone_href">$phone_icon<span><strong>Позвонить</strong><span class="dock-number">$phone</span></span></a>
     <a class="dock-request" href="${prefix}request.html#request">Заявка $arrow</a>
   </aside>
   $dialog

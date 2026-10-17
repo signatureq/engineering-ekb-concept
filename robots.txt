@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /cms-preview/
+Sitemap: https://stroy-ekb.ru/sitemap.xml

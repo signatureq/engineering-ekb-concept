@@ -1,0 +1,12 @@
+.git
+.venv
+.local
+.impeccable
+.build
+**/__pycache__
+**/*.pyc
+**/.env
+**/db.sqlite3
+**/*.sqlite3
+PRODUCT.md
+README.md

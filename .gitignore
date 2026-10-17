@@ -5,3 +5,13 @@ PRODUCT.md
 README.md
 *.zip
 node_modules/
+.venv/
+.build/
+.local/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+server/db.sqlite3
+server/staticfiles/
