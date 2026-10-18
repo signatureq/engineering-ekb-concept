@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timezone
 from email import policy
 from email.parser import BytesParser
 from unittest.mock import MagicMock, patch
@@ -29,11 +30,14 @@ class InquiryTests(TestCase):
         sent.__enter__.return_value.read.return_value = b'{"success":"true","message":"Thanks!"}'
         mock.return_value = sent
 
+    @patch('cms.inquiries.timezone.now', return_value=datetime(2026, 10, 18, 19, 43, tzinfo=timezone.utc))
     @patch('cms.inquiries.urlopen')
-    def test_sends_to_configured_recipient_with_private_attachments(self, outbound):
+    def test_sends_all_russian_fields_and_private_attachments(self, outbound, now):
         self.provider(outbound)
-        data = {**self.data, 'to': 'attacker@example.com',
-                'files': SimpleUploadedFile('plan.pdf', b'%PDF-test', 'application/pdf')}
+        message = 'Нужен монтаж: 120 м труб.\nВторой этаж, вход со двора.\nСхема & фотографии во вложениях.'
+        data = {**self.data, 'to': 'attacker@example.com', 'message': message,
+                'files': [SimpleUploadedFile('plan.pdf', b'%PDF-test', 'application/pdf'),
+                          SimpleUploadedFile('фото.png', b'\x89PNG\r\n\x1a\n\x00\xff', 'image/png')]}
         result = self.post(data)
         self.assertEqual(result.status_code, 200)
         self.assertEqual(result.json(), {'ok': True})
@@ -44,15 +48,45 @@ class InquiryTests(TestCase):
         parts = list(multipart.iter_parts())
         fields = {part.get_param('name', header='content-disposition'): part.get_payload(decode=True).decode()
                   for part in parts if not part.get_filename()}
-        photo = next(part for part in parts if part.get_filename())
-        self.assertEqual(photo.get_payload(decode=True), b'%PDF-test')
-        self.assertEqual(photo.get_filename(), 'plan.pdf')
-        self.assertEqual(fields['Направление работ'], 'Теплоизоляция')
+        attachments = [part for part in parts if part.get_filename()]
+        self.assertEqual([(part.get_filename(), part.get_content_type(), part.get_payload(decode=True))
+                          for part in attachments],
+                         [('plan.pdf', 'application/pdf', b'%PDF-test'),
+                          ('фото.png', 'image/png', b'\x89PNG\r\n\x1a\n\x00\xff')])
+        self.assertEqual(attachments[0].get_param('name', header='content-disposition'), 'attachment')
+        self.assertEqual(attachments[1].get_param('name', header='content-disposition'), 'attachment1')
+        self.assertEqual(fields['Имя'], self.data['name'])
+        self.assertEqual(fields['Телефон'], self.data['phone'])
+        self.assertEqual(fields['Какие работы нужны'], 'Теплоизоляция')
+        self.assertEqual(fields['Сообщение'], message)
+        self.assertEqual(fields['Приложенные файлы'], 'plan.pdf\nфото.png')
+        self.assertEqual(fields['Дата заявки'], '19.10.2026 00:43 (Екатеринбург)')
+        self.assertEqual(fields['_subject'], 'Новая заявка с сайта СК Орион')
+        self.assertEqual(fields['_template'], 'basic')
         self.assertEqual(fields['Номер заявки'], self.data['request_id'])
         self.assertEqual(request.get_header('Origin'), 'https://site.example')
         self.assertEqual(request.get_header('Referer'), 'https://site.example/request.html')
         self.assertNotIn('attacker@example.com', fields.values())
         self.assertIn('no-store', result['Cache-Control'])
+
+    @patch('cms.inquiries.urlopen')
+    def test_optional_fields_and_all_five_attachments_are_preserved(self, outbound):
+        self.provider(outbound)
+        files = [SimpleUploadedFile(f'plan-{n}.pdf', b'%PDF-' + bytes([n])) for n in range(5)]
+        self.assertEqual(self.post(dict(self.data, service='', message='', files=files)).status_code, 200)
+        request = outbound.call_args.args[0]
+        multipart = BytesParser(policy=policy.default).parsebytes(
+            ('Content-Type: ' + request.get_header('Content-type') + '\r\n\r\n').encode() + request.data)
+        attachments = [part for part in multipart.iter_parts() if part.get_filename()]
+        self.assertEqual([part.get_payload(decode=True) for part in attachments],
+                         [b'%PDF-' + bytes([n]) for n in range(5)])
+        fields = {part.get_param('name', header='content-disposition'): part.get_payload(decode=True).decode()
+                  for part in multipart.iter_parts() if not part.get_filename()}
+        self.assertEqual(fields['Какие работы нужны'], 'Не указано')
+        self.assertEqual(fields['Сообщение'], 'Сообщение не указано.')
+
+        self.assertEqual(self.post(dict(self.data, service='', message='')).status_code, 200)
+        self.assertIn('Без вложений', outbound.call_args.args[0].data.decode())
 
     @patch('cms.inquiries.urlopen')
     def test_invalid_contact_bot_and_files_do_not_send(self, outbound):

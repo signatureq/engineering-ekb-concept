@@ -1,6 +1,7 @@
 """Same-origin inquiry endpoint backed by FormSubmit."""
 import json
 import logging
+import mimetypes
 import re
 import uuid
 from pathlib import Path
@@ -11,6 +12,7 @@ from urllib.request import Request, urlopen
 from django.conf import settings
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
+from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from .models import Service
 
@@ -41,7 +43,9 @@ def multipart_body(fields, files):
         parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="{key}"\r\n\r\n{value}\r\n'.encode())
     for index, file in enumerate(files):
         filename = file.name.replace('\r', '').replace('\n', '').replace('"', "'").replace('\\', '_')
-        parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="attachment{index}"; filename="{filename}"\r\nContent-Type: application/octet-stream\r\n\r\n'.encode())
+        field_name = 'attachment' if index == 0 else f'attachment{index}'
+        content_type = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+        parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="{field_name}"; filename="{filename}"\r\nContent-Type: {content_type}\r\n\r\n'.encode())
         parts.extend([file.read(), b'\r\n'])
     parts.append(f'--{boundary}--\r\n'.encode())
     return b''.join(parts), 'multipart/form-data; boundary=' + boundary
@@ -78,11 +82,13 @@ def inquiry(request):
     fields = {
         'Имя': name,
         'Телефон': phone,
-        'Направление работ': services[service],
-        'Описание задачи': message or 'Описание не указано.',
+        'Какие работы нужны': services[service],
+        'Сообщение': message or 'Сообщение не указано.',
+        'Приложенные файлы': '\n'.join(file.name for file in files) or 'Без вложений',
+        'Дата заявки': timezone.localtime().strftime('%d.%m.%Y %H:%M') + ' (Екатеринбург)',
         'Номер заявки': request_id,
         '_subject': 'Новая заявка с сайта СК Орион',
-        '_template': 'table',
+        '_template': 'basic',
         # CSRF, bot-trap and IP rate limiting are enforced by our own server.
         '_captcha': 'false',
     }
