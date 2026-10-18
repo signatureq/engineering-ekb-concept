@@ -147,13 +147,19 @@ class CMSTests(TestCase):
             self.article.full_clean()
 
     def test_profile_rebuilds_shared_contacts(self):
-        profile = SiteSettings.objects.create(company_name='СК Проверка', phone='+7 (999) 123-45-67', hero_description='Новый текст первого экрана.')
+        profile = SiteSettings.objects.create(company_name='СК Проверка', phone='+7 (999) 123-45-67', hero_description='Новый текст первого экрана.', company_subtitle='Компания по монтажу', region='Первоуральск & область', footer_description='Строим инженерные системы.', emergency_notice='Обращения с 8 до 20')
         publish_settings(profile.pk)
         home = self.public_text('index.html')
         self.assertIn('Новый текст первого экрана.', home)
         self.assertIn('tel:+79991234567', home)
         self.assertNotIn('tel:+79024453001', home)
         self.assertIn('СК ПРОВЕРКА', self.public_text('services.html'))
+        for route in ('index.html', 'contacts.html', 'services.html', 'works.html', 'articles.html'):
+            text = self.public_text(route)
+            self.assertIn('Компания по монтажу', text)
+            self.assertIn('Первоуральск &amp; область', text)
+            self.assertIn('Строим инженерные системы.', text)
+            self.assertIn('Обращения с 8 до 20', text)
         self.assertFalse((self.data / 'public/server').exists())
         self.assertFalse((self.data / 'public/content').exists())
 

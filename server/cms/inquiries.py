@@ -12,18 +12,19 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.http import require_http_methods
+from .models import Service
 
 logger = logging.getLogger(__name__)
 MAX_ATTACHMENTS = 5
 MAX_BYTES = 10 * 1024 * 1024
 EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.dwg', '.dxf', '.zip'}
-SERVICES = {
-    '': 'Не указано',
-    'pipeline-installation': 'Монтаж трубопроводов',
-    'insulation': 'Теплоизоляция',
-    'metering': 'Узлы учёта',
-    'emergency': 'Аварийные работы',
-}
+
+def published_services():
+    # Use the same published snapshot as the form, never an editor's draft title.
+    services = {'': 'Не указано'}
+    for payload in Service.objects.filter(published_payload__isnull=False).values_list('published_payload', flat=True):
+        services[payload['slug']] = payload['title']
+    return services
 
 
 def response(data, status=200):
@@ -58,11 +59,12 @@ def inquiry(request):
     phone = request.POST.get('phone', '').strip()
     message = request.POST.get('message', '').strip()
     service = request.POST.get('service', '')
+    services = published_services()
     if (request.POST.get('website') or not name or len(name) > 100 or
             any(char in name for char in '\r\n') or len(phone) > 40 or
             not re.fullmatch(r'[+\d\s()\-]+', phone) or
             not 10 <= len(re.sub(r'\D', '', phone)) <= 15 or
-            len(message) > 5000 or service not in SERVICES):
+            len(message) > 5000 or service not in services):
         return response({'error': 'Проверьте имя и телефон. В описании допускается до 5000 символов.'}, 400)
     try:
         request_id = str(uuid.UUID(request.POST.get('request_id', '')))
@@ -76,7 +78,7 @@ def inquiry(request):
     fields = {
         'Имя': name,
         'Телефон': phone,
-        'Направление работ': SERVICES[service],
+        'Направление работ': services[service],
         'Описание задачи': message or 'Описание не указано.',
         'Номер заявки': request_id,
         '_subject': 'Новая заявка с сайта СК Орион',

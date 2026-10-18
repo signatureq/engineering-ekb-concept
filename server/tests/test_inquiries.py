@@ -4,13 +4,16 @@ from email.parser import BytesParser
 from unittest.mock import MagicMock, patch
 from urllib.error import HTTPError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import Client, SimpleTestCase, override_settings
+from django.test import Client, TestCase, override_settings
+from cms.models import Service
 
 
 @override_settings(SECURE_SSL_REDIRECT=False, ALLOWED_HOSTS=['testserver'],
                    INQUIRY_TO_EMAIL='owner@example.com', INQUIRY_SITE_URL='https://site.example')
-class InquiryTests(SimpleTestCase):
+class InquiryTests(TestCase):
     def setUp(self):
+        self.service = Service.objects.create(slug='insulation', title='Черновик нового названия',
+            published_payload={'slug': 'insulation', 'title': 'Теплоизоляция'})
         self.client = Client(enforce_csrf_checks=True)
         self.token = self.client.get('/api/inquiry/').json()['csrfToken']
         self.data = {'name': 'Тестовый клиент', 'phone': '+7 (999) 123-45-67',
@@ -97,4 +100,22 @@ class InquiryTests(SimpleTestCase):
     def test_missing_configuration_disables_delivery(self, outbound):
         self.assertFalse(self.client.get('/api/inquiry/').json()['enabled'])
         self.assertEqual(self.post().status_code, 503)
+        outbound.assert_not_called()
+
+    @patch('cms.inquiries.urlopen')
+    def test_added_services_use_published_name_and_reject_unpublished_entries(self, outbound):
+        self.provider(outbound)
+        added = Service.objects.create(slug='ventilyaciya', title='Черновик вентиляции')
+        self.assertEqual(self.post(dict(self.data, service=added.slug)).status_code, 400)
+        outbound.assert_not_called()
+        added.published_payload = {'slug': added.slug, 'title': 'Монтаж вентиляции'}
+        added.save(update_fields=['published_payload'])
+        self.assertEqual(self.post(dict(self.data, service=added.slug)).status_code, 200)
+        body = outbound.call_args.args[0].data.decode()
+        self.assertIn('Монтаж вентиляции', body)
+        self.assertNotIn('Черновик вентиляции', body)
+        added.published_payload = None
+        added.save(update_fields=['published_payload'])
+        outbound.reset_mock()
+        self.assertEqual(self.post(dict(self.data, service=added.slug)).status_code, 400)
         outbound.assert_not_called()

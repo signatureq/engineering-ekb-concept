@@ -1,5 +1,6 @@
 {% extends "admin/change_form.html" %}
 {% block form_top %}<p class="cms-editor-intro">Напишите статью и добавьте фотографию. Всё остальное сайт заполнит автоматически.</p>{% endblock %}
+{% block content_subtitle %}{% endblock %}
 {% block object-tools-items %}{% endblock %}
 {% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Управление сайтом</a> / <a href="{% url 'admin:cms_article_changelist' %}">Статьи</a> / {% if original %}Редактирование{% else %}Новая статья{% endif %}</div>{% endblock %}
 {% block submit_buttons_bottom %}

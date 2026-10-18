@@ -2,6 +2,6 @@
 {% load i18n static %}
 {% block title %}{{ title }} · СК Орион{% endblock %}
 {% block dark-mode-vars %}{% endblock %}
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'cms/admin.css' %}">{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'cms/admin.css' %}?v=20261019-content">{% endblock %}
 {% block branding %}<div id="site-name"><a class="cms-brand" href="{% url 'admin:index' %}"><strong>СК ОРИОН<span>.</span></strong><span>Управление сайтом</span></a></div>{% endblock %}
 {% block userlinks %}{% if site_url %}<a href="{{ site_url }}" target="_blank" rel="noopener">Открыть сайт</a> / {% endif %}<a href="{% url 'admin:password_change' %}">Пароль</a> / <form id="logout-form" method="post" action="{% url 'admin:logout' %}">{% csrf_token %}<button type="submit">Выйти</button></form>{% endblock %}

@@ -56,7 +56,7 @@ def article_payload(article):
     return {'slug': article.slug, 'title': article.title, 'category': article.category, 'summary': article.summary, 'body': article.body, 'seo_title': article.seo_title, 'seo_description': article.seo_description, 'cover': cover, 'cover_alt': article.cover_alt, 'cover_width': width, 'cover_height': height, 'service': article.service, 'featured': article.featured, 'published_at': first, 'updated_at': now}
 
 
-def prepare_build(build):
+def prepare_build(build, overrides=None):
     public = build / 'public'
     public.mkdir(parents=True)
     articles = [a.published_payload for a in Article.objects.filter(published_payload__isnull=False)]
@@ -64,22 +64,41 @@ def prepare_build(build):
     old_uploads = settings.CMS_PUBLIC_ROOT / 'assets/uploads'
     if old_uploads.is_dir():
         shutil.copytree(old_uploads, public / 'assets/uploads', dirs_exist_ok=True)
-    for payload in articles:
-        cover = payload['cover']
-        if cover.startswith('assets/uploads/'):
-            name = Path(cover).name
-            original = settings.MEDIA_ROOT / 'articles' / name
-            if not original.is_file():
-                raise PublicationError('Не найдена фотография опубликованной статьи. Восстановите её из резервной копии.')
-            dest = public / cover
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(original, dest)
+    pages = published_collection(SitePage, 'pages.json')
+    services = published_collection(Service, 'services.json')
+    projects = published_collection(Project, 'projects.json')
+    collections = {'sitepage': pages, 'service': services, 'project': projects}
+    for kind, payload in (overrides or {}).items():
+        identity = 'route' if kind == 'sitepage' else 'slug'
+        collections[kind][:] = [row for row in collections[kind] if row[identity] != payload[identity]] + [payload]
+    def collect_uploads(value):
+        if isinstance(value, dict):
+            for child in value.values():
+                yield from collect_uploads(child)
+        elif isinstance(value, list):
+            for child in value:
+                yield from collect_uploads(child)
+        elif isinstance(value, str) and value.startswith('assets/uploads/'):
+            yield value
+    for cover in set(collect_uploads([articles, pages, services, projects])):
+        name = Path(cover).name
+        original = next((settings.MEDIA_ROOT / folder / name for folder in ('articles', 'content') if (settings.MEDIA_ROOT / folder / name).is_file()), None)
+        if original is None:
+            raise PublicationError('Не найдена опубликованная фотография. Восстановите её из резервной копии.')
+        dest = public / cover
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(original, dest)
+    content_files = []
+    for name, payload in [('pages', pages), ('services', services), ('projects', projects)]:
+        target = build / (name + '.json')
+        target.write_text(json.dumps(payload, ensure_ascii=False, indent=2))
+        content_files += ['--' + name + '-file', str(target)]
     article_file = build / 'articles.json'
     site_file = build / 'site.json'
     article_file.write_text(json.dumps(articles, ensure_ascii=False, indent=2))
     site_file.write_text(json.dumps(current_profile(), ensure_ascii=False, indent=2))
     try:
-        result = subprocess.run([sys.executable, str(settings.SITE_ROOT / 'scripts/build_site.py'), '--output-dir', str(public), '--articles-file', str(article_file), '--site-file', str(site_file)], capture_output=True, text=True, timeout=90)
+        result = subprocess.run([sys.executable, str(settings.SITE_ROOT / 'scripts/build_site.py'), '--output-dir', str(public), '--articles-file', str(article_file), '--site-file', str(site_file), *content_files], capture_output=True, text=True, timeout=90)
     except (OSError, subprocess.TimeoutExpired) as error:
         raise PublicationError('Сборка сайта не завершилась. Сохранённые черновики доступны; повторите публикацию.') from error
     if result.returncode:
@@ -160,3 +179,85 @@ def publish_settings(pk):
         profile.published_payload = profile.as_dict()
         profile.save(update_fields=['published_payload'])
     return change_and_build(change)
+
+
+from .models import SitePage, PageSection, Service, Project, ProjectPhoto, ContentImport
+
+
+def image_payload(source, uploaded=None, caption='Фотография'):
+    if uploaded:
+        path = Path(uploaded.path)
+        src = 'assets/uploads/' + path.name
+    else:
+        path = (settings.SITE_ROOT / source).resolve()
+        if not path.is_relative_to(settings.SITE_ROOT / 'assets'):
+            raise PublicationError('Выберите фотографию сайта или загрузите новый файл.')
+        src = source
+    if not path.is_file():
+        raise PublicationError('Фотография не найдена. Загрузите её снова.')
+    with Image.open(path) as im:
+        width, height = im.size
+    return {'src': src, 'small': src, 'width': width, 'height': height, 'small_width': width, 'caption': caption}
+
+
+def content_payload(obj):
+    common = {'title': obj.title, 'seo_title': obj.seo_title, 'seo_description': obj.seo_description}
+    if isinstance(obj, SitePage):
+        payload = {**common, 'route': obj.route, 'label': obj.label, 'intro': obj.intro, 'image': '', 'sections': []}
+        if obj.image or obj.image_upload:
+            payload['image'] = image_payload(obj.image, obj.image_upload, obj.title)['src']
+        for section in obj.sections.all():
+            image = image_payload(section.image, section.image_upload, section.title)['src'] if section.image or section.image_upload else ''
+            payload['sections'].append({'key': section.key, 'title': section.title, 'body': section.body, 'image': image})
+        return payload
+    if isinstance(obj, Service):
+        photo = image_payload(obj.image, obj.image_upload, obj.title)
+        related = [p.published_payload['slug'] for p in Project.objects.filter(published_payload__isnull=False) if p.published_payload.get('service') == obj.slug]
+        return {**common, 'position': obj.position, 'slug': obj.slug, 'summary': obj.summary, 'intro': obj.intro, 'scope': [line.strip() for line in obj.scope.splitlines() if line.strip()], 'prepare': obj.prepare, 'image': photo['src'], 'width': photo['width'], 'height': photo['height'], 'alt': obj.title, 'works': related}
+    if isinstance(obj, Project):
+        photos = []
+        for photo in obj.photos.all():
+            if photo.image_upload:
+                item = image_payload('', photo.image_upload, photo.caption or obj.title)
+            else:
+                item = {**photo.source, 'caption': photo.caption or obj.title}
+                # Seeded photos also pass the same safe-path and file validation.
+                image_payload(item.get('src', ''), caption=item['caption'])
+            photos.append(item)
+        if not photos:
+            raise PublicationError('Добавьте хотя бы одну фотографию работы перед публикацией.')
+        return {**common, 'position': obj.position, 'slug': obj.slug, 'summary': obj.summary, 'description': obj.description, 'details': [line.strip() for line in obj.details.splitlines() if line.strip()], 'location': obj.location or None, 'category': obj.category, 'service': obj.service.slug if obj.service else '', 'cover_position': (obj.published_payload or {}).get('cover_position', '50% 50%'), 'photos': photos}
+    raise PublicationError('Раздел не найден.')
+
+
+def publish_content(model, pk):
+    def change():
+        obj = model.objects.select_for_update().get(pk=pk)
+        obj.full_clean()
+        obj.published_payload = content_payload(obj)
+        obj.first_published_at = obj.first_published_at or timezone.now()
+        obj.save(update_fields=['published_payload', 'first_published_at'])
+    return change_and_build(change)
+
+
+def unpublish_content(model, pk):
+    if model not in (Service, Project):
+        raise PublicationError('Основную страницу сайта нельзя скрыть.')
+    def change():
+        model.objects.filter(pk=pk).update(published_payload=None)
+    return change_and_build(change)
+
+
+def published_collection(model, filename):
+    rows = model.objects.all()
+    if not rows.exists():
+        if ContentImport.objects.filter(key='site-sections').exists():
+            return []
+        initial = json.loads((settings.SITE_ROOT / 'content' / filename).read_text())
+        if model == SitePage:
+            for page in initial:
+                if page['route'] == 'index.html':
+                    page['intro'] = current_profile().get('hero_description', page['intro'])
+        return initial
+    snapshots = [row.published_payload for row in rows.order_by('pk') if row.published_payload is not None]
+    return sorted(snapshots, key=lambda item: item.get('position', 0)) if model in (Service, Project) else snapshots

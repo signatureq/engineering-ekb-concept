@@ -1,0 +1,10 @@
+{% extends "admin/change_form.html" %}
+{% block form_top %}<p class="cms-editor-intro">Измените текст или фотографии, затем сохраните или опубликуйте. Сохранённые правки видны только вам до публикации.</p>{% endblock %}
+{% block content_subtitle %}{% endblock %}
+{% block object-tools-items %}{% endblock %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Управление сайтом</a> / <a href="{{ cms_list_url }}">{{ cms_content_label }}</a> / Редактирование</div>{% endblock %}
+{% block submit_buttons_bottom %}<div class="cms-save-area"><p>«Сохранить» оставляет правки в редакторе. «Опубликовать» обновляет сайт.</p><div class="submit-row cms-submit-row">
+{% if has_change_permission or has_add_permission %}<input type="submit" name="_publish" value="Опубликовать" class="default"><input type="submit" name="_continue" value="Сохранить"><input type="submit" name="_preview" value="Посмотреть">{% endif %}
+{% if cms_published and cms_can_hide %}<input type="submit" name="_unpublish" value="Снять с публикации" class="cms-unpublish">{% endif %}
+{% if has_delete_permission and original and not cms_published %}<a class="deletelink" href="../delete/">Удалить черновик</a>{% endif %}
+</div></div>{% endblock %}

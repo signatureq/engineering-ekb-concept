@@ -1,0 +1,2 @@
+{% extends "admin/change_list.html" %}{% load admin_urls %}
+{% block object-tools-items %}{% if has_add_permission %}<li><a href="{% url cl.opts|admin_urlname:'add' %}" class="addlink">{{ cms_add_label }}</a></li>{% endif %}{% endblock %}

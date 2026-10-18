@@ -1,2 +1,8 @@
 {% extends "admin/base_site.html" %}
-{% block content %}<div class="cms-dashboard"><p>Добавляйте полезные статьи для клиентов или обновляйте контакты компании.</p><div class="cms-dashboard-actions"><a class="cms-primary-link" href="{% url 'admin:cms_article_add' %}">Написать статью</a><a href="{% url 'admin:cms_article_changelist' %}">Все статьи</a><a href="{% url 'admin:cms_sitesettings_changelist' %}">Контакты компании</a></div><section class="cms-dashboard-note"><h2>Как добавить статью</h2><p>Напишите название и текст, выберите фотографию и нажмите «Опубликовать». Если хотите закончить позже, нажмите «Сохранить».</p></section>{% if user.is_superuser %}<p class="cms-owner-link"><a href="{% url 'admin:auth_user_changelist' %}">Управление доступом</a></p>{% endif %}</div>{% endblock %}
+{% block content %}<div class="cms-dashboard"><p>Выберите раздел, измените текст или фотографии и нажмите «Опубликовать».</p><nav class="cms-sections" aria-label="Содержимое сайта">
+<a href="{% url 'admin:cms_sitepage_changelist' %}"><strong>Страницы</strong><span>Главная, о компании, этапы работы и контакты</span></a>
+<a href="{% url 'admin:cms_service_changelist' %}"><strong>Услуги</strong><span>Описания услуг и фотографии</span></a>
+<a href="{% url 'admin:cms_project_changelist' %}"><strong>Наши работы</strong><span>Объекты, описание работ и фотогалереи</span></a>
+<a href="{% url 'admin:cms_article_changelist' %}"><strong>Статьи</strong><span>Полезные материалы для клиентов</span></a>
+<a href="{% url 'admin:cms_sitesettings_changelist' %}"><strong>Контакты компании</strong><span>Название и телефон на всём сайте</span></a>
+</nav><section class="cms-dashboard-note"><h2>Правки можно закончить позже</h2><p>«Сохранить» оставляет изменения только в редакторе. «Посмотреть» открывает сохранённый вариант. «Опубликовать» показывает его посетителям сайта.</p><a href="/" target="_blank" rel="noopener">Открыть сайт</a></section></div>{% endblock %}

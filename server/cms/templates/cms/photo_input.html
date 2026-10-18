@@ -1,0 +1,1 @@
+{% if widget.is_initial %}<span>Фотография сохранена. Чтобы заменить её, выберите новый файл.</span><br>{% endif %}<input type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %} accept="image/jpeg,image/png,image/webp">

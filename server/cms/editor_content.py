@@ -34,3 +34,12 @@ def fill_automatic_fields(article, title, body):
         elif any(word in lower for word in ('монтаж', 'труб', 'свар')):
             category, service = 'Монтаж трубопроводов', 'pipeline-installation'
         article.category, article.service = category, service
+
+
+def automatic_slug(model, title, pk=None):
+    base = slugify(''.join(RUSSIAN.get(c, c) for c in title.lower()))[:110].strip('-') or 'stranitsa-' + uuid.uuid4().hex[:8]
+    candidate, suffix = base, 2
+    while model.objects.filter(slug=candidate).exclude(pk=pk).exists():
+        candidate = f'{base}-{suffix}'
+        suffix += 1
+    return candidate
