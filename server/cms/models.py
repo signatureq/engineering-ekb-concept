@@ -60,7 +60,7 @@ class Article(models.Model):
 class SiteSettings(models.Model):
     company_name = models.CharField('Название в шапке и подвале', max_length=60, default='СК Орион')
     phone = models.CharField('Контактный телефон', max_length=30, default='+7 (902) 445-30-01', validators=[RegexValidator(r'^\+?[0-9()\s-]{10,30}$', 'Введите телефон с кодом страны, например +7 (902) 445-30-01.')])
-    hero_description = models.TextField('Текст на первом экране главной', max_length=500, default='Работаем с трубопроводами обычного и большого диаметра. Делаем теплоизоляцию инженерных систем и устраняем аварии.')
+    hero_description = models.TextField('Текст на первом экране главной', max_length=500, default='Работаем с трубопроводами любого диаметра. Делаем теплоизоляцию инженерных систем и устраняем аварии.')
     published_payload = models.JSONField(null=True, blank=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
 
