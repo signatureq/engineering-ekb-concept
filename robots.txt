@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
-Disallow: /admin/
-Disallow: /cms-preview/
+Disallow: /admin
+Disallow: /cms-preview
+Disallow: /api/
+Disallow: /livewire
 Sitemap: https://xn---96-6cdfvaagt9ccbsyd1b9kh.xn--p1ai/sitemap.xml

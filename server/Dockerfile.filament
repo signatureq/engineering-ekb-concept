@@ -1,0 +1,27 @@
+FROM php:8.4-fpm-bookworm AS app
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 CMS_DATA_DIR=/data
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 python3-pip python3-venv libicu-dev libzip-dev libonig-dev unzip libsqlite3-dev \
+    && docker-php-ext-install intl mbstring pdo_sqlite zip opcache \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+WORKDIR /app
+COPY requirements.txt /app/requirements.txt
+RUN python3 -m venv /opt/python && /opt/python/bin/pip install --no-cache-dir -r requirements.txt Pillow==13.0.0
+ENV PATH="/opt/python/bin:${PATH}"
+COPY cms/composer.json cms/composer.lock /app/cms/
+RUN cd cms && composer install --no-dev --no-scripts --no-autoloader --no-interaction --prefer-dist
+COPY . /app
+RUN chmod -R a+rX /app/cms/lang \
+    && /opt/python/bin/python -m py_compile scripts/build_site.py scripts/article_content.py scripts/site_seo.py scripts/filament_image.py \
+    && cd cms && composer dump-autoload --no-dev --optimize \
+    && php artisan filament:assets \
+    && chown -R www-data:www-data /app/cms/storage /app/cms/bootstrap/cache \
+    && printf 'upload_max_filesize=12M\npost_max_size=16M\nmemory_limit=256M\nmax_execution_time=120\nopcache.enable=1\nopcache.validate_timestamps=0\n' > /usr/local/etc/php/conf.d/orion.ini \
+    && printf '[www]\npm=ondemand\npm.max_children=3\npm.process_idle_timeout=20s\nclear_env=no\n' > /usr/local/etc/php-fpm.d/zz-orion.conf
+EXPOSE 9000
+CMD ["sh", "/app/server/start-filament.sh"]
+
+FROM nginx:stable-alpine AS web
+COPY --from=app /app/cms/public /app/cms/public
+COPY server/nginx.filament.conf /etc/nginx/conf.d/default.conf

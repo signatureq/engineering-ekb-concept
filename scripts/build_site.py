@@ -15,6 +15,7 @@ from xml.sax.saxutils import escape as xml_escape
 if str(Path(__file__).resolve().parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
 from article_content import load_articles, render_markdown, reading_minutes, display_date, article_schema, json_ld, SITE_URL, SITE_NOINDEX
+from site_seo import metadata
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECTS = json.loads((ROOT / 'content/projects.json').read_text())
@@ -51,7 +52,8 @@ def button(text, href, light=False):
     return f'<a class="button {"button-light" if light else "button-primary"}" href="{e(href)}">{e(text)} {ARROW}</a>'
 def image(photo, prefix='', eager=False, card=False):
     sizes = '(max-width: 650px) 100vw, (max-width: 1000px) 50vw, 33vw' if card else '(max-width: 850px) 100vw, 55vw'
-    return f'<img src="{prefix}{photo["src"]}" srcset="{prefix}{photo["small"]} {photo["small_width"]}w, {prefix}{photo["src"]} {photo["width"]}w" sizes="{sizes}" width="{photo["width"]}" height="{photo["height"]}" alt="{e(photo["caption"])}" loading="{"eager" if eager else "lazy"}" decoding="async" {"fetchpriority=\"high\"" if eager else ""} />'
+    priority = 'fetchpriority="high"' if eager else ''
+    return f'<img src="{prefix}{photo["src"]}" srcset="{prefix}{photo["small"]} {photo["small_width"]}w, {prefix}{photo["src"]} {photo["width"]}w" sizes="{sizes}" width="{photo["width"]}" height="{photo["height"]}" alt="{e(photo["caption"])}" loading="{"eager" if eager else "lazy"}" decoding="async" {priority} />'
 def breadcrumb(label, prefix='', parent=None):
     middle = f'<a href="{prefix}{parent[0]}">{parent[1]}</a><span aria-hidden="true">/</span>' if parent else ''
     return f'<nav class="breadcrumb" aria-label="Хлебные крошки"><a href="{prefix}index.html">Главная</a><span aria-hidden="true">/</span>{middle}<span aria-current="page">{e(label)}</span></nav>'
@@ -67,7 +69,7 @@ def project_grid(projects,prefix='',eager=False):
 def related(slugs,prefix='../',title='Работы по этому направлению',text=''):
     ps = [p for slug in slugs for p in PROJECTS if p['slug']==slug]
     return f'<section class="portfolio-section section-shell"><div class="split-heading"><h2>{e(title)}</h2><a class="text-link" href="{prefix}works.html">Все работы {ARROW}</a></div>{prose(text)}{project_grid(ps,prefix)}</section>' if ps else ''
-def document(route,title,description,content,active='',dialog='',body_class='',preload='',extra_head='',profile=None):
+def document(route,title,description,content,active='',dialog='',body_class='',preload='',extra_head='',profile=None,share_image='',social_type='website'):
     prefix = '../' * route.count('/')
     site = profile or SITE
     navigation = ''.join(f'<a href="{prefix}{path}"' + (' aria-current="page"' if active==path else '') + f'>{name}</a>' for path,name in NAV)
@@ -86,7 +88,11 @@ def document(route,title,description,content,active='',dialog='',body_class='',p
     content = content.replace('Аварийные обращения — 24/7', e(notice))
     if SITE_NOINDEX:
         extra_head += '<meta name="robots" content="noindex,nofollow" />'
-    text = BASE.substitute(title=e(title),description=e(description),site_url=e(SITE_URL),route=route,prefix=prefix,navigation=navigation,phone_icon=PHONE_ICON,arrow=ARROW,content=content,dialog=dialog,body_class=body_class,preload=preload,extra_head=extra_head,company=e(site['company_name']),company_subtitle=e(site.get('company_subtitle', 'строительная компания')),region=e(region),region_short=e('Екатеринбург и область' if region == 'Екатеринбург и Свердловская область' else region),footer_description=e(site.get('footer_description', 'Монтаж, теплоизоляция и аварийные работы.')),emergency_notice=e(notice),company_upper=e(site['company_name'].upper()),phone=e(phone),phone_href=e(phone_href),extra_script=f'<script src="{prefix}works.js?v={VERSION}" defer></script>' if route=='works.html' or route.startswith('works/') else '')
+    service = next((s for s in SERVICES if route == 'services/' + s['slug'] + '.html'), None)
+    project = next((p for p in PROJECTS if route == 'works/' + p['slug'] + '.html'), None)
+    share_image = share_image or (service['image'] if service else project['photos'][0]['src'] if project else page_data(route).get('image', ''))
+    page_title, canonical, seo_head = metadata(route,title,description,SITE_URL,site,share_image,social_type,service)
+    text = BASE.substitute(page_title=e(page_title),canonical=e(canonical),seo_head=seo_head,title=e(title),description=e(description),site_url=e(SITE_URL),route=route,prefix=prefix,navigation=navigation,phone_icon=PHONE_ICON,arrow=ARROW,content=content,dialog=dialog,body_class=body_class,preload=preload,extra_head=extra_head,company=e(site['company_name']),company_subtitle=e(site.get('company_subtitle', 'строительная компания')),region=e(region),region_short=e('Екатеринбург и область' if region == 'Екатеринбург и Свердловская область' else region),footer_description=e(site.get('footer_description', 'Монтаж, теплоизоляция и аварийные работы.')),emergency_notice=e(notice),company_upper=e(site['company_name'].upper()),phone=e(phone),phone_href=e(phone_href),extra_script=f'<script src="{prefix}works.js?v={VERSION}" defer></script>' if route=='works.html' or route.startswith('works/') else '')
     if not any(service['slug'] == 'emergency' for service in SERVICES):
         text = text.replace(prefix + 'services/emergency.html', prefix + 'contacts.html')
     if route == 'index.html':
@@ -204,7 +210,8 @@ def article_card(item, prefix='', heading='h2'):
 def article_preview(items):
     if not items:
         return ''
-    return f'<section class="article-preview section-shell"><div class="split-heading"><h2>{e(section_data('index.html','articles')['title'])}</h2><a class="text-link" href="articles.html">Все статьи {ARROW}</a></div>{prose(section_data('index.html','articles')['body'])}<div class="article-preview-grid">' + ''.join(article_card(a,heading='h3') for a in items[:3]) + '</div></section>'
+    block = section_data('index.html', 'articles')
+    return f'<section class="article-preview section-shell"><div class="split-heading"><h2>{e(block["title"])}</h2><a class="text-link" href="articles.html">Все статьи {ARROW}</a></div>{prose(block["body"])}<div class="article-preview-grid">' + ''.join(article_card(a,heading='h3') for a in items[:3]) + '</div></section>'
 
 
 def article_document(item, items=(), preview=False, profile=None):
@@ -217,9 +224,8 @@ def article_document(item, items=(), preview=False, profile=None):
     others=[a for a in items if a['slug']!=item['slug']][:2]
     if others:
         main+='<section class="article-related section-shell"><div class="split-heading"><h2>Ещё по теме</h2><a class="text-link" href="../articles.html">Все статьи '+ARROW+'</a></div><div class="article-index-grid">'+''.join(article_card(a,'../') for a in others)+'</div></section>'
-    meta = '<meta name="robots" content="noindex,nofollow" />' if preview else json_ld(article_schema(item))
-    meta+=f'<meta property="og:type" content="article" /><meta property="og:title" content="{e(item.get("seo_title") or title)}" /><meta property="og:description" content="{e(item.get("seo_description") or item["summary"])}" /><meta property="og:image" content="{SITE_URL}/{e(item["cover"])}" /><meta property="og:url" content="{SITE_URL}/articles/{e(item["slug"])}.html" />'
-    return document('articles/'+item['slug']+'.html',item.get('seo_title') or title,item.get('seo_description') or item['summary'],main,'articles.html',body_class='article-page',extra_head=meta,profile=profile)
+    meta = '<meta name="robots" content="noindex,nofollow" />' if preview else json_ld(article_schema(item, (profile or SITE)['company_name']))
+    return document('articles/'+item['slug']+'.html',item.get('seo_title') or title,item.get('seo_description') or item['summary'],main,'articles.html',body_class='article-page',extra_head=meta,profile=profile,share_image=item['cover'],social_type='article')
 
 
 def build_articles(items):
@@ -249,7 +255,7 @@ def build_articles(items):
         lastmod=next((a['updated_at'][:10] for a in items if relative=='articles/'+a['slug']+'.html'),None)
         urls.append('<url><loc>'+xml_escape(url)+'</loc>'+('<lastmod>'+lastmod+'</lastmod>' if lastmod else '')+'</url>')
     (OUTPUT_ROOT/'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+'\n'.join(urls)+'\n</urlset>\n')
-    (OUTPUT_ROOT/'robots.txt').write_text('User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /cms-preview/\nSitemap: '+SITE_URL+'/sitemap.xml\n')
+    (OUTPUT_ROOT/'robots.txt').write_text('User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /cms-preview\nDisallow: /api/\nDisallow: /livewire\nSitemap: '+SITE_URL+'/sitemap.xml\n')
 
 
 def main():
@@ -273,7 +279,7 @@ def main():
     if args.pages_file.resolve() == (ROOT/'content/pages.json').resolve():
         page_data('index.html')['intro'] = SITE['hero_description']
     if OUTPUT_ROOT!=ROOT:
-        for asset in ('styles.css','pages.css','script.js','works.js'):
+        for asset in ('styles.css','pages.css','script.js','works.js','favicon.ico','favicon.svg'):
             shutil.copy2(ROOT/asset,OUTPUT_ROOT/asset)
         shutil.copytree(ROOT/'assets',OUTPUT_ROOT/'assets',dirs_exist_ok=True)
     build_site()

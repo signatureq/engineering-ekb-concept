@@ -13,3 +13,12 @@ private-backup-*
 **/*.sqlite3
 PRODUCT.md
 README.md
+**/vendor
+!cms/lang/vendor
+!cms/lang/vendor/**
+**/node_modules
+cms/storage/logs/*
+cms/storage/framework/*/*
+**/*.sqlite
+**/AGENTS.md
+**/CLAUDE.md

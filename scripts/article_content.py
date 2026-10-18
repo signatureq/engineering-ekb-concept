@@ -88,15 +88,15 @@ def display_date(value):
     return f'{d.day} {months[d.month - 1]} {d.year}'
 
 
-def article_schema(item):
+def article_schema(item, company='СК Орион'):
     url = f'{SITE_URL}/articles/{item["slug"]}.html'
     return {
         '@context': 'https://schema.org', '@type': 'Article',
         'headline': item['title'], 'description': item.get('seo_description') or item['summary'],
         'datePublished': item['published_at'], 'dateModified': item['updated_at'],
         'image': f'{SITE_URL}/{item["cover"]}', 'mainEntityOfPage': url,
-        'author': {'@type': 'Organization', 'name': 'СК Орион'},
-        'publisher': {'@type': 'Organization', 'name': 'СК Орион', 'url': SITE_URL},
+        'author': {'@type': 'Organization', 'name': company},
+        'publisher': {'@type': 'Organization', 'name': company, 'url': SITE_URL},
     }
 
 

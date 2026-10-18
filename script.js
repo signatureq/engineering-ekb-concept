@@ -130,6 +130,11 @@ if (document.querySelector('#inquiry-form')) {
     status.classList.add('is-info');
     status.textContent = 'Отправляем заявку…';
     const data = new FormData(form);
+    const uploads = data.getAll('files');
+    data.delete('files');
+    uploads.forEach(file => {
+      if (file instanceof File && file.size) data.append('files[]', file);
+    });
     requestId ||= crypto.randomUUID();
     data.set('request_id', requestId);
     const controller = new AbortController();
