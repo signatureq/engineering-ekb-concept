@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /cms-preview/
-Sitemap: https://stroy-ekb.ru/sitemap.xml
+Sitemap: https://xn---96-6cdfvaagt9ccbsyd1b9kh.xn--p1ai/sitemap.xml

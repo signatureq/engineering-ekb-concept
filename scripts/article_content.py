@@ -10,7 +10,7 @@ from urllib.parse import urlsplit
 from markdown_it import MarkdownIt
 
 ROOT = Path(__file__).resolve().parents[1]
-SITE_URL = os.environ.get('PUBLIC_SITE_URL', 'https://stroy-ekb.ru').rstrip('/')
+SITE_URL = os.environ.get('PUBLIC_SITE_URL', 'https://xn---96-6cdfvaagt9ccbsyd1b9kh.xn--p1ai').rstrip('/')
 _site_address = urlsplit(SITE_URL)
 if (_site_address.scheme not in ('https', 'http') or not _site_address.hostname
         or _site_address.username or _site_address.password

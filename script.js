@@ -95,17 +95,8 @@ if (document.querySelector('#inquiry-form')) {
   const submit = form.querySelector('[type=submit]');
   const notice = form.querySelector('.form-demo-notice');
   const endpoint = '/api/inquiry/';
-  // GitHub Pages has no server API; FormSubmit supports cross-origin form posts.
-  const staticHost = ['stroy-ekb.ru', 'www.stroy-ekb.ru', 'signatureq.github.io'].includes(window.location.hostname);
   const configPromise = fetch(endpoint, {credentials: 'same-origin', cache: 'no-store'})
-    .then(async response => {
-      if (response.ok) return {...await response.json(), endpoint};
-      if (response.status === 404 && staticHost) return {
-        enabled: true, external: true,
-        endpoint: 'https://formsubmit.co/ajax/dudin777.dudin@yandex.ru'
-      };
-      return null;
-    })
+    .then(response => response.ok ? response.json() : null)
     .then(config => {
       if (config?.enabled) notice.hidden = true;
       return config;
@@ -138,34 +129,19 @@ if (document.querySelector('#inquiry-form')) {
     form.setAttribute('aria-busy', 'true');
     status.classList.add('is-info');
     status.textContent = 'Отправляем заявку…';
-    let data = new FormData(form);
+    const data = new FormData(form);
     requestId ||= crypto.randomUUID();
     data.set('request_id', requestId);
-    if (config.external) {
-      data = new FormData();
-      data.set('Имя', name.value.trim());
-      data.set('Телефон', phone.value.trim());
-      data.set('Направление работ', form.elements.service.selectedOptions[0].textContent);
-      data.set('Описание задачи', form.elements.message.value.trim());
-      data.set('Номер заявки', requestId);
-      data.set('_subject', 'Новая заявка с сайта СК Орион');
-      data.set('_template', 'table');
-      data.set('_captcha', 'false');
-      data.set('_honey', form.elements.website.value);
-      [...selectedFiles.files].forEach((file, index) => data.append(`attachment${index}`, file));
-    }
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30000);
     try {
-      const result = await fetch(config.endpoint, {
-        method: 'POST', body: data, credentials: config.external ? 'omit' : 'same-origin', signal: controller.signal,
-        headers: config.external ? {'Accept': 'application/json'} : {'X-CSRFToken': config.csrfToken}
+      const result = await fetch(endpoint, {
+        method: 'POST', body: data, credentials: 'same-origin', signal: controller.signal,
+        headers: {'X-CSRFToken': config.csrfToken}
       });
       const answer = await result.json().catch(() => ({}));
-      const accepted = config.external ? answer.success === true || answer.success === 'true' : answer.ok === true;
-      if (!result.ok || !accepted) {
-        const activation = config.external && /activat/i.test(answer.message || '');
-        throw new Error(result.status === 429 ? 'Слишком много попыток. Подождите минуту или позвоните нам.' : activation ? 'Приём заявок ещё настраивается. Пожалуйста, позвоните нам.' : answer.error || 'Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.');
+      if (!result.ok || answer.ok !== true) {
+        throw new Error(result.status === 429 ? 'Слишком много попыток. Подождите минуту или позвоните нам.' : answer.error || 'Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.');
       }
       form.reset();
       selectedFiles.items.clear();

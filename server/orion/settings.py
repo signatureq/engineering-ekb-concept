@@ -55,5 +55,5 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 7 * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 LOGIN_URL = '/admin/login/'
 INQUIRY_TO_EMAIL = os.environ.get('INQUIRY_TO_EMAIL', '')
-INQUIRY_SITE_URL = os.environ.get('PUBLIC_SITE_URL', 'https://stroy-ekb.ru').rstrip('/')
+INQUIRY_SITE_URL = os.environ.get('PUBLIC_SITE_URL', 'https://xn---96-6cdfvaagt9ccbsyd1b9kh.xn--p1ai').rstrip('/')
 LOGGING = {'version': 1, 'disable_existing_loggers': False, 'handlers': {'console': {'class': 'logging.StreamHandler'}}, 'root': {'handlers': ['console'], 'level': 'INFO'}}

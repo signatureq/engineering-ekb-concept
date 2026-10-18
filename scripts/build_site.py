@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the static Pages site. Run: python3 scripts/build_site.py.
+"""Build the public website. Run: python3 scripts/build_site.py.
 Edit content/projects.json for project names, addresses, descriptions and photos.
 No runtime, dependencies or routing server required.
 """
