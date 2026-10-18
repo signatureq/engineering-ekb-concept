@@ -2,13 +2,22 @@
 from datetime import date
 from html import escape
 import json
+import os
 from pathlib import Path
 import re
+from urllib.parse import urlsplit
 
 from markdown_it import MarkdownIt
 
 ROOT = Path(__file__).resolve().parents[1]
-SITE_URL = 'https://stroy-ekb.ru'
+SITE_URL = os.environ.get('PUBLIC_SITE_URL', 'https://stroy-ekb.ru').rstrip('/')
+_site_address = urlsplit(SITE_URL)
+if (_site_address.scheme not in ('https', 'http') or not _site_address.hostname
+        or _site_address.username or _site_address.password
+        or _site_address.path or _site_address.query or _site_address.fragment
+        or not re.fullmatch(r'[A-Za-z0-9.\[\]:-]+', _site_address.netloc)):
+    raise ValueError('PUBLIC_SITE_URL must be an http(s) origin without a path or credentials.')
+SITE_NOINDEX = os.environ.get('PUBLIC_SITE_NOINDEX', '0') == '1'
 SLUG = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*$')
 CATEGORIES = ('Монтаж трубопроводов', 'Теплоизоляция', 'Узлы учёта', 'Инженерные сети', 'Аварийные работы')
 

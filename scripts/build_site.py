@@ -14,7 +14,7 @@ from xml.sax.saxutils import escape as xml_escape
 
 if str(Path(__file__).resolve().parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-from article_content import load_articles, render_markdown, reading_minutes, display_date, article_schema, json_ld, SITE_URL
+from article_content import load_articles, render_markdown, reading_minutes, display_date, article_schema, json_ld, SITE_URL, SITE_NOINDEX
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECTS = json.loads((ROOT / 'content/projects.json').read_text())
@@ -65,7 +65,9 @@ def document(route,title,description,content,active='',dialog='',body_class='',p
     phone = site.get('phone', '+7 (902) 445-30-01')
     phone_href = 'tel:+' + ''.join(c for c in phone if c.isdigit())
     content = content.replace('+7 (902) 445-30-01', e(phone)).replace('tel:+79024453001', e(phone_href))
-    text = BASE.substitute(title=e(title),description=e(description),route=route,prefix=prefix,navigation=navigation,phone_icon=PHONE_ICON,arrow=ARROW,content=content,dialog=dialog,body_class=body_class,preload=preload,extra_head=extra_head,company=e(site['company_name']),company_upper=e(site['company_name'].upper()),phone=e(phone),phone_href=e(phone_href),extra_script=f'<script src="{prefix}works.js?v={VERSION}" defer></script>' if route=='works.html' or route.startswith('works/') else '')
+    if SITE_NOINDEX:
+        extra_head += '<meta name="robots" content="noindex,nofollow" />'
+    text = BASE.substitute(title=e(title),description=e(description),site_url=e(SITE_URL),route=route,prefix=prefix,navigation=navigation,phone_icon=PHONE_ICON,arrow=ARROW,content=content,dialog=dialog,body_class=body_class,preload=preload,extra_head=extra_head,company=e(site['company_name']),company_upper=e(site['company_name'].upper()),phone=e(phone),phone_href=e(phone_href),extra_script=f'<script src="{prefix}works.js?v={VERSION}" defer></script>' if route=='works.html' or route.startswith('works/') else '')
     if route == 'index.html':
         text = text.replace('request.html#request', '#contact')
     return '\n'.join(line.rstrip() for line in text.splitlines()) + '\n'

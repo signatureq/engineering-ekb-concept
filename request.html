@@ -11,7 +11,7 @@
 
   <link rel="stylesheet" href="styles.css?v=20261013-pages" />
   <link rel="stylesheet" href="pages.css?v=20261017-articles-final" />
-  <script src="script.js?v=20261013-pages" defer></script>
+  <script src="script.js?v=20261018-formsubmit" defer></script>
 
 
 </head>
@@ -32,20 +32,21 @@
     <a href="request.html#request">Оставить заявку</a>
     <a class="button button-primary" href="tel:+79024453001">+7 (902) 445-30-01 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 3 3 5-2.5 2.5a15 15 0 0 0 6 6L16 14l5 3v3a1 1 0 0 1-1 1C10.6 21 3 13.4 3 4a1 1 0 0 1 1-1h3Z"/></svg></a>
   </nav>
-  <main id="main"><div class="section-shell"><nav class="breadcrumb" aria-label="Хлебные крошки"><a href="index.html">Главная</a><span aria-hidden="true">/</span><span aria-current="page">Заявка на работы</span></nav><div class="page-heading"><h1>Заявка на работы</h1><p>Расскажите об объекте и задаче. Для срочного обращения позвоните: +7 (902) 445-30-01.</p></div></div><section class="request-layout section-shell" id="request"><div class="request-guidance"><h2>Что нужно сделать?</h2><p>Укажите направление работ, адрес объекта и удобное время для связи. Фотографии и схемы помогут понять задачу.</p><div class="request-phone"><span>Связаться напрямую</span><a href="tel:+79024453001">+7 (902) 445-30-01</a><p>Аварийные обращения — 24/7.</p></div></div><form class="contact-form" id="inquiry-form" novalidate>
+  <main id="main"><div class="section-shell"><nav class="breadcrumb" aria-label="Хлебные крошки"><a href="index.html">Главная</a><span aria-hidden="true">/</span><span aria-current="page">Заявка на работы</span></nav><div class="page-heading"><h1>Заявка на работы</h1><p>Расскажите об объекте и задаче. Для срочного обращения позвоните: +7 (902) 445-30-01.</p></div></div><section class="request-layout section-shell" id="request"><div class="request-guidance"><h2>Что нужно сделать?</h2><p>Укажите направление работ, адрес объекта и удобное время для связи. Фотографии и схемы помогут понять задачу.</p><div class="request-phone"><span>Связаться напрямую</span><a href="tel:+79024453001">+7 (902) 445-30-01</a><p>Аварийные обращения — 24/7.</p></div></div><form class="contact-form" id="inquiry-form" method="post" enctype="multipart/form-data" novalidate>
             <p class="form-demo-notice">Отправка через форму пока недоступна. Для заявки позвоните <a href="tel:+79024453001">+7 (902) 445-30-01</a>.</p>
             <div class="form-grid">
-              <label><span class="field-label">Ваше имя <b>*</b></span><input name="name" type="text" autocomplete="name" placeholder="Как к вам обращаться" required /></label>
-              <label><span class="field-label">Телефон <b>*</b></span><input name="phone" type="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" required /></label>
+              <label><span class="field-label">Ваше имя <b>*</b></span><input name="name" type="text" maxlength="100" autocomplete="name" placeholder="Как к вам обращаться" required /></label>
+              <label><span class="field-label">Телефон <b>*</b></span><input name="phone" type="tel" maxlength="40" autocomplete="tel" placeholder="+7 (___) ___-__-__" required /></label>
             </div>
             <label class="service-choice"><span class="field-label">Какие работы нужны</span><select name="service"><option value="">Выберите направление</option value="pipeline-installation">Монтаж трубопроводов</option><option value="insulation">Теплоизоляция</option><option value="metering">Узлы учёта</option><option value="emergency">Аварийные работы</option></select></label>
-            <label class="message-label"><span class="field-label">Коротко о задаче <span class="optional-label">необязательно</span></span><textarea name="message" rows="3" placeholder="Если удобно, расскажите, что нужно сделать"></textarea></label>
+            <label class="message-label"><span class="field-label">Коротко о задаче <span class="optional-label">необязательно</span></span><textarea name="message" rows="3" maxlength="5000" placeholder="Если удобно, расскажите, что нужно сделать"></textarea></label>
+            <div class="visually-hidden" aria-hidden="true"><label>Ваш сайт<input name="website" tabindex="-1" autocomplete="off" /></label></div>
 
             <div class="upload-block" id="upload-block">
               <div class="upload-heading"><span class="upload-symbol" aria-hidden="true">＋</span><div><h3>Приложить документы</h3><p>Чертежи, ТЗ или другие материалы — если они есть</p></div></div>
               <label class="dropzone" id="dropzone" for="files">
                 <span class="dropzone-main">Перетащите файлы сюда или <span>выберите на устройстве</span></span>
-                <span class="dropzone-detail">Фото, PDF, DOC, DOCX, XLS, XLSX, DWG, DXF, ZIP</span>
+                <span class="dropzone-detail">Фото, PDF, DOC, DOCX, XLS, XLSX, DWG, DXF, ZIP · до 5 файлов, всего до 10 МБ</span>
                 <input class="visually-hidden" id="files" name="files" type="file" multiple accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.xls,.xlsx,.dwg,.dxf,.zip" />
               </label>
               <ul class="file-list" id="file-list" aria-live="polite"></ul>

@@ -3,6 +3,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 import json
+import os
 import subprocess
 import sqlite3
 from django.conf import settings
@@ -31,6 +32,18 @@ class CMSTests(TestCase):
 
     def public_text(self, path):
         return (self.data / 'public' / path).read_text()
+
+    def test_server_origin_is_used_for_all_search_metadata(self):
+        output = self.data / 'new-domain'
+        environment = {**os.environ, 'PUBLIC_SITE_URL': 'https://new-example.ru', 'PUBLIC_SITE_NOINDEX': '1'}
+        subprocess.run([__import__('sys').executable, str(settings.SITE_ROOT / 'scripts/build_site.py'), '--output-dir', str(output)], env=environment, capture_output=True, text=True, check=True)
+        home = (output / 'index.html').read_text()
+        article = (output / 'articles/podgotovka-k-montazhu-truboprovoda.html').read_text()
+        self.assertIn('href="https://new-example.ru/index.html"', home)
+        self.assertIn('content="noindex,nofollow"', home)
+        self.assertNotIn('https://stroy-ekb.ru', article)
+        self.assertIn('https://new-example.ru/', (output / 'sitemap.xml').read_text())
+        self.assertIn('https://new-example.ru/sitemap.xml', (output / 'robots.txt').read_text())
 
     def form_data(self):
         a = self.article

@@ -1,0 +1,27 @@
+{
+    default_sni {$SERVER_IP}
+}
+
+{$SITE_ADDRESS} {
+    encode zstd gzip
+    header ?X-Robots-Tag {$SITE_ROBOTS_POLICY:all}
+    reverse_proxy web:80
+    tls {
+        issuer acme {
+            dir https://acme-v02.api.letsencrypt.org/directory
+            profile shortlived
+        }
+    }
+}
+
+{$SERVER_IP} {
+    encode zstd gzip
+    header >X-Robots-Tag noindex,nofollow
+    reverse_proxy web:80
+    tls {
+        issuer acme {
+            dir https://acme-v02.api.letsencrypt.org/directory
+            profile shortlived
+        }
+    }
+}

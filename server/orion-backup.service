@@ -1,0 +1,9 @@
+[Unit]
+Description=Private backup of Orion CMS database and uploads
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/orion-backup
+UMask=0077

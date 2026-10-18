@@ -21,14 +21,16 @@ document.addEventListener('keydown', event => {
   }
 });
 
-// Form submission is intentionally deferred until server deployment.
+// The same-origin server endpoint keeps mail credentials out of the public site.
 if (document.querySelector('#inquiry-form')) {
   const fileInput = document.querySelector('#files');
   const fileList = document.querySelector('#file-list');
   const dropzone = document.querySelector('#dropzone');
   const selectedFiles = new DataTransfer();
+  let requestId = null;
 
   function renderFiles() {
+    requestId = null;
     fileList.replaceChildren();
     [...selectedFiles.files].forEach((file, index) => {
       const item = document.createElement('li');
@@ -63,7 +65,11 @@ if (document.querySelector('#inquiry-form')) {
     }
     chosen.filter(file => allowed.test(file.name)).forEach(file => {
       const duplicate = [...selectedFiles.files].some(entry => entry.name === file.name && entry.size === file.size);
-      if (!duplicate) selectedFiles.items.add(file);
+      const total = [...selectedFiles.files].reduce((sum, entry) => sum + entry.size, 0);
+      if (!duplicate && (selectedFiles.files.length >= 5 || total + file.size > 10 * 1024 * 1024)) {
+        message.classList.remove('is-info');
+        message.textContent = 'Можно приложить до 5 файлов общим размером до 10 МБ.';
+      } else if (!duplicate) selectedFiles.items.add(file);
     });
     fileInput.files = selectedFiles.files;
     renderFiles();
@@ -86,22 +92,97 @@ if (document.querySelector('#inquiry-form')) {
     form.elements.service.value = requestedService;
   }
   const status = document.querySelector('#form-status');
-  form.querySelector('[type=submit]').disabled = false;
-  form.addEventListener('submit', event => {
+  const submit = form.querySelector('[type=submit]');
+  const notice = form.querySelector('.form-demo-notice');
+  const endpoint = '/api/inquiry/';
+  // GitHub Pages has no server API; FormSubmit supports cross-origin form posts.
+  const staticHost = ['stroy-ekb.ru', 'www.stroy-ekb.ru', 'signatureq.github.io'].includes(window.location.hostname);
+  const configPromise = fetch(endpoint, {credentials: 'same-origin', cache: 'no-store'})
+    .then(async response => {
+      if (response.ok) return {...await response.json(), endpoint};
+      if (response.status === 404 && staticHost) return {
+        enabled: true, external: true,
+        endpoint: 'https://formsubmit.co/ajax/dudin777.dudin@yandex.ru'
+      };
+      return null;
+    })
+    .then(config => {
+      if (config?.enabled) notice.hidden = true;
+      return config;
+    }).catch(() => null);
+  form.addEventListener('input', () => { requestId = null; });
+  submit.disabled = false;
+  form.addEventListener('submit', async event => {
     event.preventDefault();
+    if (submit.disabled) return;
     status.classList.remove('is-info');
     const name = form.elements.name;
     const phone = form.elements.phone;
     [name, phone].forEach(field => field.removeAttribute('aria-invalid'));
-    if (!name.value.trim() || !phone.value.trim()) {
+    const validPhone = /^[+\d\s()\-]+$/.test(phone.value.trim()) && /^\d{10,15}$/.test(phone.value.replace(/\D/g, ''));
+    if (!name.value.trim() || !validPhone) {
       if (!name.value.trim()) name.setAttribute('aria-invalid', 'true');
-      if (!phone.value.trim()) phone.setAttribute('aria-invalid', 'true');
-      status.textContent = 'Заполните имя и телефон, чтобы продолжить.';
+      if (!validPhone) phone.setAttribute('aria-invalid', 'true');
+      status.textContent = 'Укажите имя и телефон с кодом города или оператора.';
       (!name.value.trim() ? name : phone).focus();
       return;
     }
+    submit.disabled = true;
+    const config = await configPromise;
+    if (!config?.enabled) {
+      status.classList.add('is-info');
+      status.textContent = 'Отправка через форму пока недоступна. Пожалуйста, позвоните нам.';
+      submit.disabled = false;
+      return;
+    }
+    form.setAttribute('aria-busy', 'true');
     status.classList.add('is-info');
-    status.textContent = 'Заявка не отправлена: приём обращений через сайт ещё не подключён.';
+    status.textContent = 'Отправляем заявку…';
+    let data = new FormData(form);
+    requestId ||= crypto.randomUUID();
+    data.set('request_id', requestId);
+    if (config.external) {
+      data = new FormData();
+      data.set('Имя', name.value.trim());
+      data.set('Телефон', phone.value.trim());
+      data.set('Направление работ', form.elements.service.selectedOptions[0].textContent);
+      data.set('Описание задачи', form.elements.message.value.trim());
+      data.set('Номер заявки', requestId);
+      data.set('_subject', 'Новая заявка с сайта СК Орион');
+      data.set('_template', 'table');
+      data.set('_captcha', 'false');
+      data.set('_honey', form.elements.website.value);
+      [...selectedFiles.files].forEach((file, index) => data.append(`attachment${index}`, file));
+    }
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+    try {
+      const result = await fetch(config.endpoint, {
+        method: 'POST', body: data, credentials: config.external ? 'omit' : 'same-origin', signal: controller.signal,
+        headers: config.external ? {'Accept': 'application/json'} : {'X-CSRFToken': config.csrfToken}
+      });
+      const answer = await result.json().catch(() => ({}));
+      const accepted = config.external ? answer.success === true || answer.success === 'true' : answer.ok === true;
+      if (!result.ok || !accepted) {
+        const activation = config.external && /activat/i.test(answer.message || '');
+        throw new Error(result.status === 429 ? 'Слишком много попыток. Подождите минуту или позвоните нам.' : activation ? 'Приём заявок ещё настраивается. Пожалуйста, позвоните нам.' : answer.error || 'Не удалось отправить заявку. Попробуйте ещё раз или позвоните нам.');
+      }
+      form.reset();
+      selectedFiles.items.clear();
+      fileInput.files = selectedFiles.files;
+      renderFiles();
+      requestId = null;
+      status.textContent = 'Заявка отправлена. Мы свяжемся с вами по указанному телефону.';
+    } catch (error) {
+      status.classList.remove('is-info');
+      status.textContent = error.name === 'AbortError' || error instanceof TypeError
+        ? 'Не удалось получить ответ. Данные остались в форме — попробуйте ещё раз или позвоните нам.'
+        : error.message;
+    } finally {
+      clearTimeout(timeout);
+      submit.disabled = false;
+      form.removeAttribute('aria-busy');
+    }
   });
 }
 

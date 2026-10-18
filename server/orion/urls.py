@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.urls import path, re_path
 from cms import views
+from cms.inquiries import inquiry
 
 urlpatterns = [
+    path('api/inquiry/', inquiry, name='inquiry'),
     path('cms-preview/<int:pk>/', admin.site.admin_view(views.preview_article), name='article-preview'),
     path('admin/article-cover/<int:pk>/', admin.site.admin_view(views.article_cover), name='article-cover'),
     path('admin/', admin.site.urls),
