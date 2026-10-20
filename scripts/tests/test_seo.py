@@ -14,7 +14,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'scripts'))
-from article_content import SITE_URL, article_schema
+from article_content import SITE_URL, article_schema, load_articles, render_markdown
 from site_seo import metadata
 
 
@@ -49,6 +49,34 @@ class Document(HTMLParser):
         if tag == 'script' and self.reading_schema:
             self.schemas.append(json.loads(self.schema_text))
             self.reading_schema = False
+
+
+class ArticleHeadings(HTMLParser):
+    def __init__(self, source):
+        super().__init__()
+        self.in_article = False
+        self.in_h2 = False
+        self.headings = []
+        self.text = ''
+        self.feed(source)
+
+    def handle_starttag(self, tag, attributes):
+        if tag == 'article' and 'article-prose' in dict(attributes).get('class', '').split():
+            self.in_article = True
+        if tag == 'h2':
+            self.in_h2 = True
+            self.text = ''
+
+    def handle_data(self, text):
+        if self.in_h2:
+            self.text += text
+
+    def handle_endtag(self, tag):
+        if tag == 'h2':
+            self.headings.append((self.text, self.in_article))
+            self.in_h2 = False
+        if tag == 'article':
+            self.in_article = False
 
 
 class SearchReadinessTests(unittest.TestCase):
@@ -121,6 +149,18 @@ class SearchReadinessTests(unittest.TestCase):
                 self.assertEqual(icon.size, (size, size))
         with Image.open(self.output / 'favicon.ico') as icon:
             self.assertEqual(icon.ico.sizes(), {(16, 16), (32, 32), (48, 48)})
+
+    def test_article_h2_headings_come_only_from_the_unchanged_editorial_body(self):
+        for article in load_articles(ROOT / 'content/articles.json'):
+            with self.subTest(article=article['slug']):
+                html = (self.output / 'articles' / (article['slug'] + '.html')).read_text()
+                body, _ = render_markdown(article['body'])
+                headings = ArticleHeadings(html).headings
+                expected = ArticleHeadings('<article class="article-prose">' + body + '</article>').headings
+                self.assertGreater(len(headings), 0)
+                self.assertEqual(headings, expected)
+                self.assertTrue(all(in_body for _, in_body in headings))
+                self.assertIn(body, html)
 
     def test_editable_company_is_preserved_in_structured_data(self):
         site = {'company_name': 'Монтаж «Тест»', 'phone': '+7 (902) 445-30-01'}

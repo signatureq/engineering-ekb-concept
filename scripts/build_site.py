@@ -10,6 +10,7 @@ import json
 import argparse
 import shutil
 import sys
+from urllib.parse import urlsplit
 from xml.sax.saxutils import escape as xml_escape
 
 if str(Path(__file__).resolve().parent) not in sys.path:
@@ -28,6 +29,7 @@ PHONE = '+7 (902) 445-30-01'
 SVG = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">{}</svg>'
 ARROW = SVG.format('<path d="M5 12h14m-6-6 6 6-6 6"/>')
 PHONE_ICON = SVG.format('<path d="m7 3 3 5-2.5 2.5a15 15 0 0 0 6 6L16 14l5 3v3a1 1 0 0 1-1 1C10.6 21 3 13.4 3 4a1 1 0 0 1 1-1h3Z"/>')
+MESSAGE_ICON = SVG.format('<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H5l-3 2V11.5A8.5 8.5 0 0 1 10.5 3h2a8.5 8.5 0 0 1 8.5 8.5Z"/><path d="M7 9h10M7 13h6"/>')
 EXPAND = SVG.format('<path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/>')
 NAV = [('services.html','Услуги'),('works.html','Наши работы'),('about.html','О компании'),('process.html','Как работаем'),('articles.html','Статьи'),('contacts.html','Контакты')]
 CATEGORIES = {'outside':'Наружные сети','inside':'Внутренние системы','insulation':'Теплоизоляция'}
@@ -59,9 +61,29 @@ def breadcrumb(label, prefix='', parent=None):
     return f'<nav class="breadcrumb" aria-label="Хлебные крошки"><a href="{prefix}index.html">Главная</a><span aria-hidden="true">/</span>{middle}<span aria-current="page">{e(label)}</span></nav>'
 def page_head(title, text, prefix='', parent=None):
     return f'<div class="section-shell">{breadcrumb(title,prefix,parent)}<div class="page-heading"><h1>{e(title)}</h1><p>{e(text)}</p></div></div>'
-def callout(prefix='', title='Обсудим ваш объект', text='Расскажите, какие работы нужны и где находится объект.', service=''):
+def callout(prefix='', title='Обсудим ваш объект', text='Расскажите, какие работы нужны и где находится объект.', service='', heading='h2'):
     target = f'{prefix}request.html' + (f'?service={service}' if service else '') + '#request'
-    return f'<section class="inquiry-band section-shell"><div><h2>{e(title)}</h2><p>{e(text)}</p></div><div class="inquiry-actions">{button("Оставить заявку",target,True)}<a class="band-phone" href="tel:+79024453001">{PHONE}</a></div></section>'
+    return f'<section class="inquiry-band section-shell" aria-label="{e(title)}"><div><{heading} class="inquiry-title">{e(title)}</{heading}><p>{e(text)}</p></div><div class="inquiry-actions">{button("Оставить заявку",target,True)}<a class="band-phone" href="tel:+79024453001">{PHONE}</a><!--inquiry-messenger--></div></section>'
+
+
+def max_address(site):
+    value = (site.get('max_url') or '').strip()
+    address = urlsplit(value)
+    return value if address.scheme == 'https' and address.hostname in ('max.ru', 'www.max.ru') and address.path not in ('', '/') and not address.username and not address.password else ''
+
+
+def max_link(url, label='Написать в MAX', css='text-link'):
+    return f'<a class="{css}" href="{e(url)}" target="_blank" rel="noopener noreferrer">{MESSAGE_ICON}<span>{e(label)}</span></a>' if url else ''
+
+
+def extra_contacts(site):
+    result = ''
+    url = max_address(site)
+    if url:
+        result += '<div class="contact-extra contact-messenger"><h2>Напишите нам в MAX</h2><p>Отправьте вопрос, фотографии объекта или схему — обсудим вашу задачу в переписке.</p>' + max_link(url) + '</div>'
+    if (site.get('office_address') or '').strip():
+        result += '<div class="contact-extra contact-office"><h2>Адрес офиса</h2><address>' + e(site['office_address']).replace('\n', '<br />') + '</address></div>'
+    return result
 def project_card(p,prefix='',eager=False):
     return f'''<article class="portfolio-card" data-category="{p['category']}"><a href="{prefix}works/{p['slug']}.html" class="portfolio-link"><div class="portfolio-cover" style="--photo-position:{p['cover_position']}">{image(p['photos'][0],prefix,eager,True)}<span class="photo-count">{len(p['photos'])} фото</span></div><div class="portfolio-copy"><p class="portfolio-category">{CATEGORIES[p['category']]}</p><h2>{e(p['title'])}</h2><p>{e(p['summary'])}</p><span class="portfolio-open">Смотреть работу {ARROW}</span></div></a></article>'''
 def project_grid(projects,prefix='',eager=False):
@@ -86,13 +108,16 @@ def document(route,title,description,content,active='',dialog='',body_class='',p
     notice = site.get('emergency_notice', 'Аварийные обращения — 24/7')
     content = content.replace('Екатеринбург и Свердловская область', e(region)).replace('Екатеринбург · Свердловская область', e(region))
     content = content.replace('Аварийные обращения — 24/7', e(notice))
+    max_url = max_address(site)
+    content = content.replace('<!--extra-company-contacts-->', extra_contacts(site))
+    content = content.replace('<!--inquiry-messenger-->', max_link(max_url, css='band-messenger'))
     if SITE_NOINDEX:
         extra_head += '<meta name="robots" content="noindex,nofollow" />'
     service = next((s for s in SERVICES if route == 'services/' + s['slug'] + '.html'), None)
     project = next((p for p in PROJECTS if route == 'works/' + p['slug'] + '.html'), None)
     share_image = share_image or (service['image'] if service else project['photos'][0]['src'] if project else page_data(route).get('image', ''))
     page_title, canonical, seo_head = metadata(route,title,description,SITE_URL,site,share_image,social_type,service)
-    text = BASE.substitute(page_title=e(page_title),canonical=e(canonical),seo_head=seo_head,title=e(title),description=e(description),site_url=e(SITE_URL),route=route,prefix=prefix,navigation=navigation,phone_icon=PHONE_ICON,arrow=ARROW,content=content,dialog=dialog,body_class=body_class,preload=preload,extra_head=extra_head,company=e(site['company_name']),company_subtitle=e(site.get('company_subtitle', 'строительная компания')),region=e(region),region_short=e('Екатеринбург и область' if region == 'Екатеринбург и Свердловская область' else region),footer_description=e(site.get('footer_description', 'Монтаж, теплоизоляция и аварийные работы.')),emergency_notice=e(notice),company_upper=e(site['company_name'].upper()),phone=e(phone),phone_href=e(phone_href),extra_script=f'<script src="{prefix}works.js?v={VERSION}" defer></script>' if route=='works.html' or route.startswith('works/') else '')
+    text = BASE.substitute(max_footer=max_link(max_url,css='footer-max'),max_dock=max_link(max_url,label='MAX',css='dock-max'),max_dock_class=' has-messenger' if max_url else '',page_title=e(page_title),canonical=e(canonical),seo_head=seo_head,title=e(title),description=e(description),site_url=e(SITE_URL),route=route,prefix=prefix,navigation=navigation,phone_icon=PHONE_ICON,arrow=ARROW,content=content,dialog=dialog,body_class=body_class+(' with-messenger' if max_url else ''),preload=preload,extra_head=extra_head,company=e(site['company_name']),company_subtitle=e(site.get('company_subtitle', 'строительная компания')),region=e(region),region_short=e('Екатеринбург и область' if region == 'Екатеринбург и Свердловская область' else region),footer_description=e(site.get('footer_description', 'Монтаж, теплоизоляция и аварийные работы.')),emergency_notice=e(notice),company_upper=e(site['company_name'].upper()),phone=e(phone),phone_href=e(phone_href),extra_script=f'<script src="{prefix}works.js?v={VERSION}" defer></script>' if route=='works.html' or route.startswith('works/') else '')
     if not any(service['slug'] == 'emergency' for service in SERVICES):
         text = text.replace(prefix + 'services/emergency.html', prefix + 'contacts.html')
     if route == 'index.html':
@@ -183,18 +208,20 @@ def build_site():
     about += f'<section class="reading-section section-shell"><h2>{e(coverage["title"])}</h2><div>{prose(coverage["body"])}</div></section>'+callout()
     render('about.html',page_data('about.html')['title'],page_data('about.html')['intro'],about,'about.html')
 
-    process=heading('process.html')+'<section class="steps section-shell" aria-label="Этапы работы">'
+    process_page = page_data('process.html')
+    process_photo = process_page.get('image') or 'assets/client/pipeline-installation.jpg'
+    process = f'<div class="section-shell">{breadcrumb(process_page["title"])}<header class="process-heading"><div><h1>{e(process_page["title"])}</h1><p>{e(process_page["intro"])}</p><a class="text-link" href="#prepare">Что подготовить к обращению {ARROW}</a></div><figure class="process-photo"><img src="{e(process_photo)}" alt="Работы на объекте СК Орион" width="1200" height="1600" fetchpriority="high" /><figcaption>Работы на объектах СК Орион</figcaption></figure></header></div><section class="process-flow section-shell" aria-label="Этапы работы"><ol class="process-stages" role="list">'
     for number in range(1,5):
         block = section_data('process.html','step'+str(number))
-        process += f'<article><span>{number:02d}</span><h2>{e(block["title"])}</h2><div class="step-description">{prose(block["body"])}</div></article>'
+        process += f'<li class="process-step"><span class="process-step-number" aria-hidden="true">{number:02d}</span><div class="process-step-copy"><h2>{e(block["title"])}</h2><div class="step-description">{prose(block["body"])}</div></div></li>'
     block = section_data('process.html','prepare')
-    process += f'</section><section class="reading-section section-shell"><h2>{e(block["title"])}</h2><div>{prose(block["body"])}</div></section>'+callout()
+    process += f'</ol></section><section class="process-prepare section-shell" id="prepare"><div><h2>{e(block["title"])}</h2>{button("Оставить заявку","request.html#request")}</div><div class="prepare-list">{prose(block["body"])}</div></section>'+callout()
     render('process.html',page_data('process.html')['title'],page_data('process.html')['intro'],process,'process.html')
 
     call = section_data('contacts.html','call')
     request = section_data('contacts.html','request')
     coverage = section_data('contacts.html','coverage')
-    contacts=heading('contacts.html')+f'<section class="contacts-layout section-shell"><div class="contact-primary"><h2>{e(call["title"])}</h2><a class="contact-number" href="tel:+79024453001">{PHONE}</a>{prose(call["body"])}{button("Позвонить","tel:+79024453001")}</div><div class="contact-secondary"><h2>{e(request["title"])}</h2>{prose(request["body"])}<a class="text-link" href="request.html#request">Перейти к заявке {ARROW}</a><h3>{e(coverage["title"])}</h3>{prose(coverage["body"])}</div></section>'+emergency_block()
+    contacts=heading('contacts.html')+f'<section class="contacts-layout section-shell"><div class="contact-primary"><h2>{e(call["title"])}</h2><a class="contact-number" href="tel:+79024453001">{PHONE}</a>{prose(call["body"])}{button("Позвонить","tel:+79024453001")}</div><div class="contact-secondary"><h2>{e(request["title"])}</h2>{prose(request["body"])}<a class="text-link" href="request.html#request">Перейти к заявке {ARROW}</a><!--extra-company-contacts--><h3>{e(coverage["title"])}</h3>{prose(coverage["body"])}</div></section>'+emergency_block()
     render('contacts.html',page_data('contacts.html')['title'],page_data('contacts.html')['intro'],contacts,'contacts.html')
     guidance = section_data('request.html','guidance')
     request = heading('request.html')+f'<section class="request-layout section-shell" id="request"><div class="request-guidance"><h2>{e(guidance["title"])}</h2>{prose(guidance["body"])}<div class="request-phone"><span>Связаться напрямую</span><a href="tel:+79024453001">{PHONE}</a><p>Аварийные обращения — 24/7.</p></div></div>{request_form()}</section>'
@@ -204,7 +231,7 @@ def build_site():
 
 
 def article_card(item, prefix='', heading='h2'):
-    return f'''<article class="article-card"><a href="{prefix}articles/{item['slug']}.html"><div class="article-card-image"><img src="{prefix}{item['cover']}" alt="{e(item['cover_alt'])}" width="{item['cover_width']}" height="{item['cover_height']}" loading="lazy" decoding="async" /></div><div class="article-card-copy"><{heading}>{e(item['title'])}</{heading}><p class="article-meta"><span>{e(item['category'])}</span><span>{reading_minutes(item['body'])} мин чтения</span></p><p>{e(item['summary'])}</p><span class="article-read">Читать статью {ARROW}</span></div></a></article>'''
+    return f'''<article class="article-card"><a href="{prefix}articles/{item['slug']}.html"><div class="article-card-image"><img src="{prefix}{item['cover']}" alt="{e(item['cover_alt'])}" width="{item['cover_width']}" height="{item['cover_height']}" loading="lazy" decoding="async" /></div><div class="article-card-copy"><{heading} class="article-card-title">{e(item['title'])}</{heading}><p class="article-meta"><span>{e(item['category'])}</span><span>{reading_minutes(item['body'])} мин чтения</span></p><p>{e(item['summary'])}</p><span class="article-read">Читать статью {ARROW}</span></div></a></article>'''
 
 
 def article_preview(items):
@@ -219,11 +246,11 @@ def article_document(item, items=(), preview=False, profile=None):
     title = item['title']
     main=f'<div class="section-shell">{breadcrumb(title,"../",("articles.html","Статьи"))}<header class="article-heading"><h1>{e(title)}</h1><p class="article-standfirst">{e(item["summary"])}</p><p class="article-meta"><span>{e(item["category"])}</span><time datetime="{e(item["published_at"][:10])}">{display_date(item["published_at"])}</time><span>{reading_minutes(item["body"])} мин чтения</span></p></header><figure class="article-lead-image"><img src="../{e(item["cover"])}" alt="{e(item["cover_alt"])}" width="{item["cover_width"]}" height="{item["cover_height"]}" fetchpriority="high" /><figcaption>Фотография из портфолио СК Орион</figcaption></figure></div>'
     contents=''.join(f'<a href="#{anchor}">{e(text)}</a>' for anchor,text in toc)
-    main+=f'<div class="article-layout section-shell"><aside class="article-toc"><h2>В этой статье</h2><nav aria-label="Содержание статьи">{contents}</nav><a class="article-back" href="../articles.html">Все статьи {ARROW}</a></aside><article class="article-prose">{body}</article></div>'
-    main+=callout('../',title='Обсудим вашу задачу',text='Расскажите об объекте, приложите фотографии или схему — уточним состав работ.',service=item.get('service',''))
+    main+=f'<div class="article-layout section-shell"><aside class="article-toc"><p class="article-toc-title">В этой статье</p><nav aria-label="Содержание статьи">{contents}</nav><a class="article-back" href="../articles.html">Все статьи {ARROW}</a></aside><article class="article-prose">{body}</article></div>'
+    main+=callout('../',title='Обсудим вашу задачу',text='Расскажите об объекте, приложите фотографии или схему — уточним состав работ.',service=item.get('service',''),heading='p')
     others=[a for a in items if a['slug']!=item['slug']][:2]
     if others:
-        main+='<section class="article-related section-shell"><div class="split-heading"><h2>Ещё по теме</h2><a class="text-link" href="../articles.html">Все статьи '+ARROW+'</a></div><div class="article-index-grid">'+''.join(article_card(a,'../') for a in others)+'</div></section>'
+        main+='<section class="article-related section-shell" aria-label="Ещё по теме"><div class="split-heading"><p class="section-title">Ещё по теме</p><a class="text-link" href="../articles.html">Все статьи '+ARROW+'</a></div><div class="article-index-grid">'+''.join(article_card(a,'../',heading='p') for a in others)+'</div></section>'
     meta = '<meta name="robots" content="noindex,nofollow" />' if preview else json_ld(article_schema(item, (profile or SITE)['company_name']))
     return document('articles/'+item['slug']+'.html',item.get('seo_title') or title,item.get('seo_description') or item['summary'],main,'articles.html',body_class='article-page',extra_head=meta,profile=profile,share_image=item['cover'],social_type='article')
 

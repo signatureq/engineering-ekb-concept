@@ -33,7 +33,7 @@ class SitePageResource extends EditorialResource
             Section::make('Содержимое страницы')->schema([
                 F::text('title', 'Заголовок страницы'),
                 Textarea::make('intro')->label('Вступление')->rows(4)->maxLength(2000),
-                F::image()->visible(fn (?SitePage $record): bool => filled($record?->image) || filled($record?->image_upload)),
+                F::image()->visible(fn (?SitePage $record): bool => $record?->route === 'process.html' || filled($record?->image) || filled($record?->image_upload)),
             ]),
             Section::make('Блоки страницы')->description('Редактируйте текст и фото в существующих блоках. Их расположение на сайте сохраняется.')->schema([
                 Repeater::make('sections')->label('Блоки страницы')->hiddenLabel()->relationship()->orderColumn('position')->addable(false)->deletable(false)->reorderable(false)

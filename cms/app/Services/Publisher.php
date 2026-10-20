@@ -192,6 +192,8 @@ class Publisher
         $rules = $record instanceof SiteSetting ? [
             'company_name' => 'required|string|max:60', 'phone' => ['required', 'string', 'max:30', 'regex:/^\+?[0-9()\s-]{10,30}$/'],
             'hero_description' => 'required|string|max:500', 'region' => 'required|string|max:200',
+            'max_url' => ['nullable', 'url:https', 'max:1000', SiteSetting::MAX_URL_RULE],
+            'office_address' => 'nullable|string|max:500',
         ] : ['title' => 'required|string|max:200', 'seo_title' => 'nullable|string|max:100', 'seo_description' => 'nullable|string|max:200'];
         if ($record instanceof Article || $record instanceof Service || $record instanceof Project) {
             $rules['slug'] = ['required', 'max:140', 'regex:/\A[a-z0-9]+(?:-[a-z0-9]+)*\z/'];

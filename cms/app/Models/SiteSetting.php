@@ -10,7 +10,9 @@ class SiteSetting extends Model
 {
     public const CREATED_AT = null;
 
-    public const CONTENT_FIELDS = ['company_name', 'phone', 'hero_description', 'company_subtitle', 'region', 'footer_description', 'emergency_notice'];
+    public const CONTENT_FIELDS = ['company_name', 'phone', 'hero_description', 'company_subtitle', 'region', 'footer_description', 'emergency_notice', 'max_url', 'office_address'];
+
+    public const MAX_URL_RULE = 'regex:~\Ahttps://(?:www\.)?max\.ru/[^\s]+\z~iu';
 
     protected $guarded = [];
 
@@ -19,6 +21,7 @@ class SiteSetting extends Model
         'company_subtitle' => 'строительная компания', 'region' => 'Екатеринбург и Свердловская область',
         'footer_description' => 'Монтаж, теплоизоляция и аварийные работы.', 'emergency_notice' => 'Аварийные обращения — 24/7',
         'hero_description' => 'Работаем с трубопроводами любого диаметра. Делаем теплоизоляцию инженерных систем и устраняем аварии.',
+        'max_url' => '', 'office_address' => '',
     ];
 
     protected function casts(): array
@@ -37,7 +40,9 @@ class SiteSetting extends Model
             return 'Черновик';
         }
 
-        return app(Publisher::class)->draftPayload($this) == $this->published_payload ? 'Опубликовано' : 'Есть изменения';
+        $published = array_replace(['max_url' => '', 'office_address' => ''], $this->published_payload);
+
+        return app(Publisher::class)->draftPayload($this) == $published ? 'Опубликовано' : 'Есть изменения';
     }
 
     public function publicUrl(): string

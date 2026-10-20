@@ -19,6 +19,8 @@ def metadata(route, title, description, origin, site, image='', social_type='web
         'logo': {'@type': 'ImageObject', 'url': origin + '/assets/brand/orion-512.png', 'width': 512, 'height': 512},
         'areaServed': site.get('region', 'Екатеринбург и Свердловская область'),
     }
+    if (site.get('office_address') or '').strip():
+        organization['address'] = site['office_address'].strip()
     webpage = {
         '@type': 'WebPage', '@id': canonical + '#webpage', 'url': canonical,
         'name': page_title, 'description': description, 'inLanguage': 'ru-RU',

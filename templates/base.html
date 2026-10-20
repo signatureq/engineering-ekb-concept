@@ -15,7 +15,7 @@
   <link rel="preload" href="${prefix}assets/fonts/onest-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
   $preload
   <link rel="stylesheet" href="${prefix}styles.css?v=20261013-pages" />
-  <link rel="stylesheet" href="${prefix}pages.css?v=20261019-content" />
+  <link rel="stylesheet" href="${prefix}pages.css?v=20261021-process" />
   <script src="${prefix}script.js?v=20261019-filament-forms" defer></script>
   $extra_head
   $extra_script
@@ -41,10 +41,11 @@
   <footer class="site-footer section-shell">
     <div><a class="footer-brand" href="${prefix}index.html"><span class="brand-name">$company_upper<span class="brand-dot">.</span></span><span class="brand-subtitle">$company_subtitle</span></a><p>$footer_description<br />$region.</p></div>
     <nav aria-label="Навигация в подвале">$navigation<a href="${prefix}request.html#request">Оставить заявку</a></nav>
-    <div class="footer-end"><a class="footer-phone" href="$phone_href">$phone</a><a href="${prefix}services/emergency.html">$emergency_notice</a><a href="#top">Наверх ↑</a></div>
+    <div class="footer-end"><a class="footer-phone" href="$phone_href">$phone</a>$max_footer<a href="${prefix}services/emergency.html">$emergency_notice</a><a href="#top">Наверх ↑</a></div>
   </footer>
-  <aside class="contact-dock" aria-label="Связаться с $company">
+  <aside class="contact-dock$max_dock_class" aria-label="Связаться с $company">
     <a class="dock-call" href="$phone_href">$phone_icon<span><strong>Позвонить</strong><span class="dock-number">$phone</span></span></a>
+    $max_dock
     <a class="dock-request" href="${prefix}request.html#request">Заявка $arrow</a>
   </aside>
   $dialog
